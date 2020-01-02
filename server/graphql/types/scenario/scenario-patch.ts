@@ -5,6 +5,8 @@ export const ScenarioPatch = gql`
     id: String
     name: String
     description: String
+    schedule: String
+    timezone: String
     active: Boolean
     cuFlag: String
   }

@@ -1,14 +1,14 @@
 import { createLogger, format, transports } from 'winston'
 import 'winston-daily-rotate-file'
 import { pubsub } from '@things-factory/shell'
-import { logger } from '@things-factory/env'
+import { sleep } from './utils'
 
 import { TaskRegistry } from './task-registry'
 import { Step } from './types'
 
 import { getRepository } from 'typeorm'
 import { Scenario } from '../entities'
-import { Connections } from './connections'
+import { CronJob } from 'cron'
 
 const scenarios = {}
 
@@ -29,9 +29,12 @@ export class ScenarioEngine {
   private steps: Step[]
   private rounds: number = 0
   private _state: STATE
-  private message: String
+  private message: string
   private lastStep: number = -1
   private logger: any
+  private schedule: string
+  private timezone: string
+  private cronjob: CronJob
 
   private static logFormat = printf(({ level, message, timestamp }) => {
     return `${timestamp} ${level}: ${message}`
@@ -45,7 +48,7 @@ export class ScenarioEngine {
     if (scenarios[scenarioConfig.name]) {
       return
     }
-    var scenario = new ScenarioEngine(scenarioConfig.name, scenarioConfig.steps)
+    var scenario = new ScenarioEngine(scenarioConfig)
     scenario.start()
 
     scenarios[scenarioConfig.name] = scenario
@@ -70,8 +73,10 @@ export class ScenarioEngine {
     SCENARIOS.forEach(scenario => ScenarioEngine.load(scenario))
   }
 
-  constructor(name: string, steps: Step[]) {
+  constructor({ name, steps, schedule = '', timezone = 'Asia/Seoul' }) {
     this.name = name
+    this.schedule = schedule
+    this.timezone = timezone
     this.steps = steps || []
     this.logger = createLogger({
       format: combine(timestamp(), splat(), ScenarioEngine.logFormat),
@@ -91,14 +96,15 @@ export class ScenarioEngine {
   }
 
   async run() {
-    if (this.state == STATE.STARTED || this.steps.length == 0) {
+    if (this.state == STATE.STARTED || this.state == STATE.PAUSED || this.steps.length == 0) {
       return
     }
 
     this.state = STATE.STARTED
     var context = {
       logger: this.logger,
-      publish: this.publish.bind(this)
+      publish: this.publishData.bind(this),
+      data: {}
     }
 
     try {
@@ -106,19 +112,42 @@ export class ScenarioEngine {
         this.lastStep = (this.lastStep + 1) % this.steps.length
 
         if (this.lastStep == 0) {
+          context.data = {} /* reset context data */
           this.rounds++
           this.logger.info(`Start ${this.rounds} Rounds  #######`)
         }
 
         var step = this.steps[this.lastStep]
-        await this.process(step, context)
+        var retval = await this.process(step, context)
+        context.data[step.name] = retval
 
         this.publish()
+
+        /*
+         * 마지막 스텝에서는 두가지 방향으로 진행된다.
+         * schedule이 설정되어 있다면, 다음 스케쥴에서 다시 시작할 수 있도록 상태는 STOP이 된다.
+         * schedule이 설정되어 있지 않다면, 무한 반복으로 진행된다.
+         * FIXME 이 로직은 schedule에 무한 반복을 정의할 수 있도록 개선되어야 한다.
+         */
+        if (this.lastStep == this.steps.length - 1 && this.schedule) {
+          this.state = STATE.STOPPED
+        } else {
+          await sleep(1)
+        }
       }
     } catch (ex) {
       this.message = ex.stack ? ex.stack : ex
       this.state = STATE.HALTED
     }
+  }
+
+  publishData(tag, data) {
+    pubsub.publish('publish-data', {
+      publishData: {
+        tag,
+        data
+      }
+    })
   }
 
   publish(message?) {
@@ -162,18 +191,34 @@ export class ScenarioEngine {
   }
 
   start() {
-    this.run()
+    /*
+     * schedule이 설정되어 있다면, 스케쥴당 scenario가 1회 수행된다.
+     * schedule이 설정되어 있지 않다면, scenario는 무한 반복으로 수행된다.
+     * FIXME 이 로직은 schedule에 무한 반복을 정의할 수 있도록 개선되어야 한다.
+     */
+    if (this.schedule) {
+      if (!this.cronjob) {
+        this.cronjob = new CronJob(this.schedule, this.run.bind(this), null, true, this.timezone)
+      }
+    } else {
+      this.run()
+    }
   }
 
-  resume() {
-    this.run()
+  pause() {
+    this.state = STATE.PAUSED
   }
 
   stop() {
+    if (this.cronjob) {
+      this.cronjob.stop()
+      delete this.cronjob
+    }
+
     this.state = STATE.STOPPED
   }
 
-  despose() {
+  dispose() {
     this.stop()
   }
 

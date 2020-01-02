@@ -18,6 +18,8 @@ async function LocalGraphqlQuery(step, { logger }) {
   var data = response.data
 
   logger.info(`local-graphql-query : \n${JSON.stringify(data, null, 2)}`)
+
+  return data
 }
 
 LocalGraphqlQuery.parameterSpec = [

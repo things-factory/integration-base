@@ -9,6 +9,8 @@ async function EchoReceive(step, { logger }) {
   var message = await connection.read()
 
   logger.info(`echo-receive : '${message.toString()}'`)
+
+  return message
 }
 
 EchoReceive.parameterSpec = []

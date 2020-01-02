@@ -15,6 +15,8 @@ async function Log(step, { logger }) {
     default:
       logger.info(message)
   }
+
+  return message
 }
 
 Log.parameterSpec = [

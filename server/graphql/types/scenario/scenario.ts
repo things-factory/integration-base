@@ -8,6 +8,8 @@ export const Scenario = gql`
     description: String
     active: Boolean
     status: Int
+    schedule: String
+    timezone: String
     steps: [Step]
     updater: User
     creator: User

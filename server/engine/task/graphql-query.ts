@@ -17,6 +17,8 @@ async function GraphqlQuery(step, { logger }) {
   var data = response.data
 
   logger.info(`graphql-query : \n${JSON.stringify(data, null, 2)}`)
+
+  return data
 }
 
 GraphqlQuery.parameterSpec = [

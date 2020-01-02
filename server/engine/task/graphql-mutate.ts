@@ -17,6 +17,8 @@ async function GraphqlMutate(step, { logger }) {
   var data = response.data
 
   logger.info(`graphql-mutate : \n${JSON.stringify(data, null, 2)}`)
+
+  return data
 }
 
 GraphqlMutate.parameterSpec = [

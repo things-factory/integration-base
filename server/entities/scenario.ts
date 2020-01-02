@@ -41,6 +41,16 @@ export class Scenario {
   })
   status: number
 
+  @Column({
+    nullable: true
+  })
+  schedule: string
+
+  @Column({
+    nullable: true
+  })
+  timezone: string
+
   @OneToMany(
     type => Step,
     step => step.scenario

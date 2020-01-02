@@ -11,6 +11,8 @@ async function Sleep(step, { logger }) {
   if (duration) {
     await sleep(duration)
   }
+
+  return duration
 }
 
 Sleep.parameterSpec = [
