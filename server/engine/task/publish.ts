@@ -5,6 +5,8 @@ async function Publish(step, { logger, publish, data }) {
     params: { tag, accessor }
   } = step
 
+  console.log('tag, accessor, data', tag, accessor, data)
+
   publish(tag, data[accessor])
 
   return data
