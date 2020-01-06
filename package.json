@@ -1,6 +1,6 @@
 {
   "name": "@things-factory/integration-base",
-  "version": "1.0.0-alpha.5",
+  "version": "2.0.0",
   "main": "dist-server/index.js",
   "browser": "client/index.js",
   "things-factory": true,
@@ -28,8 +28,8 @@
     "migration:revert": "node ./node_modules/typeorm/cli.js migration:revert"
   },
   "dependencies": {
-    "@things-factory/auth-base": "^1.0.0-alpha.1",
-    "@things-factory/shell": "^1.0.0-alpha.1",
+    "@things-factory/auth-base": "^2.0.0",
+    "@things-factory/shell": "^2.0.0",
     "cron": "^1.7.2",
     "cross-fetch": "^3.0.4",
     "moment-timezone": "^0.5.27",
@@ -38,6 +38,6 @@
     "promise-socket": "^6.0.2"
   },
   "devDependencies": {
-    "@things-factory/opa-app": "^1.0.0-alpha.1"
+    "@things-factory/opa-app": "^2.0.0"
   }
 }
