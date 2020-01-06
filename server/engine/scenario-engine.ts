@@ -239,9 +239,10 @@ export class ScenarioEngine {
     if (!handler) {
       throw new Error(`no task handler for ${JSON.stringify(step)}`)
     } else {
-      await handler(step, context)
+      var retval = await handler(step, context)
     }
 
     this.logger.info(`Step done.`)
+    return retval
   }
 }

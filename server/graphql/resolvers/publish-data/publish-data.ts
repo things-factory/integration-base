@@ -12,7 +12,7 @@ export const publishData = {
     // if (!ctx.user) {
     //   return null
     // }
-    // return pubsub.asyncIterator('scenario-state')
+    // return pubsub.asyncIterator('publish-data')
     // }
     subscribe: withFilter(
       () => pubsub.asyncIterator('publish-data'),
