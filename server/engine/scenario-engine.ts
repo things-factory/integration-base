@@ -35,11 +35,11 @@ export class ScenarioEngine {
     return scenarios[name]
   }
 
-  public static async load(scenarioConfig, context?) {
+  public static async load(scenarioConfig) {
     if (scenarios[scenarioConfig.name]) {
       return
     }
-    var scenario = new ScenarioEngine(scenarioConfig, context)
+    var scenario = new ScenarioEngine(scenarioConfig)
     scenario.start()
 
     scenarios[scenarioConfig.name] = scenario
@@ -64,7 +64,7 @@ export class ScenarioEngine {
     SCENARIOS.forEach(scenario => ScenarioEngine.load(scenario))
   }
 
-  constructor({ name, steps, schedule = '', timezone = 'Asia/Seoul' }, context) {
+  constructor({ name, steps, schedule = '', timezone = 'Asia/Seoul' }, context?) {
     this.name = name
     this.schedule = schedule
     this.timezone = timezone
@@ -85,6 +85,7 @@ export class ScenarioEngine {
         ]
       }),
       publish: this.publishData.bind(this),
+      load: this.loadSubscenario.bind(this),
       data: {},
       state: STATE.READY
     }
@@ -110,31 +111,29 @@ export class ScenarioEngine {
         }
 
         var step = this.steps[this.lastStep]
-        var retval = await this.process(step, context)
-        context.data[step.name] = retval
+        var { next, state, data } = await this.process(step, context)
 
-        this.publish()
+        context.data[step.name] = data
 
-        var { next, state } = this.context
+        this.publishState()
+
+        if (state !== undefined) {
+          this.setState(state)
+        }
 
         if (next) {
           this.lastStep = this.steps.findIndex(step => {
             return step.name == next
           })
-          delete this.context.next
-        } else {
-        }
-        /*
-         * 마지막 스텝에서는 두가지 방향으로 진행된다.
-         * schedule이 설정되어 있다면, 다음 스케쥴에서 다시 시작할 수 있도록 상태는 STOP이 된다.
-         * schedule이 설정되어 있지 않다면, 무한 반복으로 진행된다.
-         * FIXME 이 로직은 schedule에 무한 반복을 정의할 수 있도록 개선되어야 한다.
-         */
-        if (this.lastStep == this.steps.length - 1 && this.schedule) {
+          if (this.lastStep == -1) {
+            throw 'Not Found Next Step'
+          }
+        } else if (this.lastStep == this.steps.length - 1) {
           this.setState(STATE.STOPPED)
-        } else {
-          await sleep(1)
+          return
         }
+
+        await sleep(1)
       }
     } catch (ex) {
       this.message = ex.stack ? ex.stack : ex
@@ -160,7 +159,7 @@ export class ScenarioEngine {
     })
   }
 
-  publish(message?) {
+  publishState(message?) {
     var steps = this.steps.length
     var step = this.lastStep + 1
 
@@ -197,15 +196,10 @@ export class ScenarioEngine {
     this.context.logger.info(message)
     this.context.state = state
 
-    this.publish(message)
+    this.publishState(message)
   }
 
   start() {
-    /*
-     * schedule이 설정되어 있다면, 스케쥴당 scenario가 1회 수행된다.
-     * schedule이 설정되어 있지 않다면, scenario는 무한 반복으로 수행된다.
-     * FIXME 이 로직은 schedule에 무한 반복을 정의할 수 있도록 개선되어야 한다.
-     */
     if (this.schedule) {
       if (!this.cronjob) {
         this.cronjob = new CronJob(this.schedule, this.run.bind(this), null, true, this.timezone)
@@ -232,7 +226,7 @@ export class ScenarioEngine {
     this.stop()
   }
 
-  async process(step, context) {
+  async process(step, context): Promise<{ next: string; state: STATE; data: object }> {
     step = {
       ...step
     } // copy step
@@ -249,7 +243,7 @@ export class ScenarioEngine {
     if (!handler) {
       throw new Error(`no task handler for ${JSON.stringify(step)}`)
     } else {
-      var retval = await handler(step, context)
+      var retval: any = await handler(step, context)
     }
 
     this.context.logger.info(`Step done.`)

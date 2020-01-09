@@ -31,4 +31,17 @@ export enum SCENARIO_STATE {
   HALTED
 }
 
-export type TaskHandler = (step: Step, context: any) => void
+type Context = {
+  logger: any
+  publish: any
+  data: any
+}
+
+export type TaskHandler = (
+  step: Step,
+  context: Context
+) => Promise<{
+  next?: string
+  state?: SCENARIO_STATE
+  data?: object
+}>

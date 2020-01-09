@@ -38,6 +38,7 @@
     "promise-socket": "^6.0.2"
   },
   "devDependencies": {
-    "@things-factory/opa-app": "^2.0.0"
+    "@things-factory/board-test": "^2.0.0",
+    "@things-factory/integration-ui": "^2.0.0"
   }
 }
