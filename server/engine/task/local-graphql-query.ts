@@ -19,7 +19,9 @@ async function LocalGraphqlQuery(step, { logger }) {
 
   logger.info(`local-graphql-query : \n${JSON.stringify(data, null, 2)}`)
 
-  return data
+  return {
+    data
+  }
 }
 
 LocalGraphqlQuery.parameterSpec = [

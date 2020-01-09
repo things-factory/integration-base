@@ -10,7 +10,9 @@ async function EchoReceive(step, { logger }) {
 
   logger.info(`echo-receive : '${message.toString()}'`)
 
-  return message
+  return {
+    data: message
+  }
 }
 
 EchoReceive.parameterSpec = []

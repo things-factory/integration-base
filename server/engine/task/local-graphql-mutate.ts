@@ -19,7 +19,9 @@ async function LocalGraphqlMutate(step, { logger }) {
 
   logger.info(`local-graphql-mutate : \n${JSON.stringify(data, null, 2)}`)
 
-  return data
+  return {
+    data
+  }
 }
 
 LocalGraphqlMutate.parameterSpec = [

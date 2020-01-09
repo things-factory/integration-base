@@ -23,4 +23,12 @@ export interface Step {
   [propName: string]: any
 }
 
+export enum SCENARIO_STATE {
+  READY,
+  STARTED,
+  PAUSED,
+  STOPPED,
+  HALTED
+}
+
 export type TaskHandler = (step: Step, context: any) => void
