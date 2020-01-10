@@ -4,7 +4,7 @@ import { pubsub } from '@things-factory/shell'
 import { sleep } from './utils'
 
 import { TaskRegistry } from './task-registry'
-import { Step, SCENARIO_STATE as STATE } from './types'
+import { Step, Context, SCENARIO_STATE } from './types'
 
 import { getRepository } from 'typeorm'
 import { Scenario } from '../entities'
@@ -21,8 +21,8 @@ export class ScenarioEngine {
   private steps: Step[]
   private rounds: number = 0
   private message: string
-  private lastStep: number = -1
-  private context: { logger: any; publish: Function; data: Object; state: STATE; next: string }
+  private nextStep: number = 0
+  private context: Context
   private schedule: string
   private timezone: string
   private cronjob: CronJob
@@ -87,30 +87,27 @@ export class ScenarioEngine {
       publish: this.publishData.bind(this),
       load: this.loadSubscenario.bind(this),
       data: {},
-      state: STATE.READY
+      state: SCENARIO_STATE.READY
     }
   }
 
   async run() {
     var state = this.getState()
-    if (state == STATE.STARTED || state == STATE.PAUSED || this.steps.length == 0) {
+    if (state == SCENARIO_STATE.STARTED || state == SCENARIO_STATE.PAUSED || this.steps.length == 0) {
       return
     }
 
-    this.setState(STATE.STARTED)
+    this.setState(SCENARIO_STATE.STARTED)
     var context = this.context
 
     try {
-      while (this.getState() == STATE.STARTED) {
-        this.lastStep = (this.lastStep + 1) % this.steps.length
-
-        if (this.lastStep == 0) {
-          context.data = {} /* reset context data */
+      while (this.getState() == SCENARIO_STATE.STARTED) {
+        if (this.nextStep == 0) {
           this.rounds++
           context.logger.info(`Start ${this.rounds} Rounds  #######`)
         }
 
-        var step = this.steps[this.lastStep]
+        var step = this.steps[this.nextStep]
         var { next, state, data } = await this.process(step, context)
 
         context.data[step.name] = data
@@ -122,29 +119,34 @@ export class ScenarioEngine {
         }
 
         if (next) {
-          this.lastStep = this.steps.findIndex(step => {
+          this.nextStep = this.steps.findIndex(step => {
             return step.name == next
           })
-          if (this.lastStep == -1) {
+          if (this.nextStep == -1) {
             throw 'Not Found Next Step'
           }
-        } else if (this.lastStep == this.steps.length - 1) {
-          this.setState(STATE.STOPPED)
+        } else if (this.nextStep == this.steps.length - 1) {
+          this.setState(SCENARIO_STATE.STOPPED)
           return
+        } else {
+          this.nextStep = this.nextStep + 1
         }
 
         await sleep(1)
       }
     } catch (ex) {
       this.message = ex.stack ? ex.stack : ex
-      this.setState(STATE.HALTED)
+      this.setState(SCENARIO_STATE.HALTED)
     }
   }
 
-  async loadSubscenario(scenarioConfig) {
+  async loadSubscenario(stepName, scenarioConfig) {
+    this.context.data[stepName] = {}
+
     var scenario = new ScenarioEngine(scenarioConfig, {
       ...this.context,
-      state: STATE.READY
+      data: this.context.data[stepName],
+      state: SCENARIO_STATE.READY
     })
 
     await scenario.run()
@@ -161,7 +163,7 @@ export class ScenarioEngine {
 
   publishState(message?) {
     var steps = this.steps.length
-    var step = this.lastStep + 1
+    var step = this.nextStep
 
     pubsub.publish('scenario-state', {
       scenarioState: {
@@ -178,7 +180,7 @@ export class ScenarioEngine {
     })
   }
 
-  getState(): STATE {
+  getState(): SCENARIO_STATE {
     return this.context.state
   }
 
@@ -210,7 +212,7 @@ export class ScenarioEngine {
   }
 
   pause() {
-    this.setState(STATE.PAUSED)
+    this.setState(SCENARIO_STATE.PAUSED)
   }
 
   stop() {
@@ -219,14 +221,14 @@ export class ScenarioEngine {
       delete this.cronjob
     }
 
-    this.setState(STATE.STOPPED)
+    this.setState(SCENARIO_STATE.STOPPED)
   }
 
   dispose() {
     this.stop()
   }
 
-  async process(step, context): Promise<{ next: string; state: STATE; data: object }> {
+  async process(step, context): Promise<{ next: string; state: SCENARIO_STATE; data: object }> {
     step = {
       ...step
     } // copy step

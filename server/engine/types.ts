@@ -31,10 +31,12 @@ export enum SCENARIO_STATE {
   HALTED
 }
 
-type Context = {
+export type Context = {
   logger: any
-  publish: any
-  data: any
+  publish: Function
+  load: Function
+  state: SCENARIO_STATE
+  data: Object
 }
 
 export type TaskHandler = (
