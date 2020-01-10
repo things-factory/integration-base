@@ -4,7 +4,7 @@ import { pubsub } from '@things-factory/shell'
 import { sleep } from './utils'
 
 import { TaskRegistry } from './task-registry'
-import { Step } from './types'
+import { Step, Context, SCENARIO_STATE } from './types'
 
 import { getRepository } from 'typeorm'
 import { Scenario } from '../entities'
@@ -14,24 +14,15 @@ const scenarios = {}
 
 const { combine, timestamp, splat, printf } = format
 
-enum STATE {
-  READY,
-  STARTED,
-  PAUSED,
-  STOPPED,
-  HALTED
-}
-
 const status = ['READY', 'STARTED', 'PAUSED', 'STOPPED', 'HALTED']
 
 export class ScenarioEngine {
   private name: string
   private steps: Step[]
   private rounds: number = 0
-  private _state: STATE
   private message: string
-  private lastStep: number = -1
-  private logger: any
+  private nextStep: number = 0
+  private context: Context
   private schedule: string
   private timezone: string
   private cronjob: CronJob
@@ -73,72 +64,92 @@ export class ScenarioEngine {
     SCENARIOS.forEach(scenario => ScenarioEngine.load(scenario))
   }
 
-  constructor({ name, steps, schedule = '', timezone = 'Asia/Seoul' }) {
+  constructor({ name, steps, schedule = '', timezone = 'Asia/Seoul' }, context?) {
     this.name = name
     this.schedule = schedule
     this.timezone = timezone
     this.steps = steps || []
-    this.logger = createLogger({
-      format: combine(timestamp(), splat(), ScenarioEngine.logFormat),
-      transports: [
-        new (transports as any).DailyRotateFile({
-          filename: `logs/scenario-${name}-%DATE%.log`,
-          datePattern: 'YYYY-MM-DD-HH',
-          zippedArchive: false,
-          maxSize: '20m',
-          maxFiles: '14d',
-          level: 'info'
-        })
-      ]
-    })
 
-    this.state = STATE.READY
+    this.context = context || {
+      logger: createLogger({
+        format: combine(timestamp(), splat(), ScenarioEngine.logFormat),
+        transports: [
+          new (transports as any).DailyRotateFile({
+            filename: `logs/scenario-${name}-%DATE%.log`,
+            datePattern: 'YYYY-MM-DD-HH',
+            zippedArchive: false,
+            maxSize: '20m',
+            maxFiles: '14d',
+            level: 'info'
+          })
+        ]
+      }),
+      publish: this.publishData.bind(this),
+      load: this.loadSubscenario.bind(this),
+      data: {},
+      state: SCENARIO_STATE.READY
+    }
   }
 
   async run() {
-    if (this.state == STATE.STARTED || this.state == STATE.PAUSED || this.steps.length == 0) {
+    var state = this.getState()
+    if (state == SCENARIO_STATE.STARTED || state == SCENARIO_STATE.PAUSED || this.steps.length == 0) {
       return
     }
 
-    this.state = STATE.STARTED
-    var context = {
-      logger: this.logger,
-      publish: this.publishData.bind(this),
-      data: {}
-    }
+    this.setState(SCENARIO_STATE.STARTED)
+    var context = this.context
 
     try {
-      while (this.state == STATE.STARTED) {
-        this.lastStep = (this.lastStep + 1) % this.steps.length
-
-        if (this.lastStep == 0) {
-          context.data = {} /* reset context data */
+      while (this.getState() == SCENARIO_STATE.STARTED) {
+        if (this.nextStep == 0) {
           this.rounds++
-          this.logger.info(`Start ${this.rounds} Rounds  #######`)
+          context.logger.info(`Start ${this.rounds} Rounds  #######`)
         }
 
-        var step = this.steps[this.lastStep]
-        var retval = await this.process(step, context)
-        context.data[step.name] = retval
+        var step = this.steps[this.nextStep]
+        var { next, state, data } = await this.process(step, context)
 
-        this.publish()
+        context.data[step.name] = data
 
-        /*
-         * 마지막 스텝에서는 두가지 방향으로 진행된다.
-         * schedule이 설정되어 있다면, 다음 스케쥴에서 다시 시작할 수 있도록 상태는 STOP이 된다.
-         * schedule이 설정되어 있지 않다면, 무한 반복으로 진행된다.
-         * FIXME 이 로직은 schedule에 무한 반복을 정의할 수 있도록 개선되어야 한다.
-         */
-        if (this.lastStep == this.steps.length - 1 && this.schedule) {
-          this.state = STATE.STOPPED
+        this.publishState()
+
+        if (state !== undefined) {
+          this.setState(state)
+        }
+
+        if (next) {
+          this.nextStep = this.steps.findIndex(step => {
+            return step.name == next
+          })
+          if (this.nextStep == -1) {
+            throw 'Not Found Next Step'
+          }
+        } else if (this.nextStep == this.steps.length - 1) {
+          this.setState(SCENARIO_STATE.STOPPED)
+          return
         } else {
-          await sleep(1)
+          this.nextStep = this.nextStep + 1
         }
+
+        await sleep(1)
       }
     } catch (ex) {
       this.message = ex.stack ? ex.stack : ex
-      this.state = STATE.HALTED
+      this.setState(SCENARIO_STATE.HALTED)
     }
+  }
+
+  async loadSubscenario(stepName, scenarioConfig) {
+    this.context.data[stepName] = {}
+
+    var scenario = new ScenarioEngine(scenarioConfig, {
+      ...this.context,
+      data: this.context.data[stepName],
+      state: SCENARIO_STATE.READY
+    })
+
+    await scenario.run()
   }
 
   publishData(tag, data) {
@@ -150,14 +161,14 @@ export class ScenarioEngine {
     })
   }
 
-  publish(message?) {
+  publishState(message?) {
     var steps = this.steps.length
-    var step = this.lastStep + 1
+    var step = this.nextStep
 
     pubsub.publish('scenario-state', {
       scenarioState: {
         name: this.name,
-        state: status[this.state],
+        state: status[this.getState()],
         progress: {
           rounds: this.rounds,
           rate: Math.round(100 * (step / steps)),
@@ -169,33 +180,28 @@ export class ScenarioEngine {
     })
   }
 
-  get state() {
-    return this._state
+  getState(): SCENARIO_STATE {
+    return this.context.state
   }
 
-  set state(state) {
-    if (this._state == state) {
+  setState(state) {
+    if (this.context.state == state) {
       return
     }
 
-    var message = `[state changed] ${status[this.state]} => ${status[state]}${
+    var message = `[state changed] ${status[this.getState()]} => ${status[state]}${
       this.message ? ' caused by ' + this.message : ''
     }`
 
     this.message = ''
 
-    this.logger.info(message)
-    this._state = state
+    this.context.logger.info(message)
+    this.context.state = state
 
-    this.publish(message)
+    this.publishState(message)
   }
 
   start() {
-    /*
-     * schedule이 설정되어 있다면, 스케쥴당 scenario가 1회 수행된다.
-     * schedule이 설정되어 있지 않다면, scenario는 무한 반복으로 수행된다.
-     * FIXME 이 로직은 schedule에 무한 반복을 정의할 수 있도록 개선되어야 한다.
-     */
     if (this.schedule) {
       if (!this.cronjob) {
         this.cronjob = new CronJob(this.schedule, this.run.bind(this), null, true, this.timezone)
@@ -206,7 +212,7 @@ export class ScenarioEngine {
   }
 
   pause() {
-    this.state = STATE.PAUSED
+    this.setState(SCENARIO_STATE.PAUSED)
   }
 
   stop() {
@@ -215,14 +221,14 @@ export class ScenarioEngine {
       delete this.cronjob
     }
 
-    this.state = STATE.STOPPED
+    this.setState(SCENARIO_STATE.STOPPED)
   }
 
   dispose() {
     this.stop()
   }
 
-  async process(step, context) {
+  async process(step, context): Promise<{ next: string; state: SCENARIO_STATE; data: object }> {
     step = {
       ...step
     } // copy step
@@ -230,19 +236,19 @@ export class ScenarioEngine {
     try {
       step.params = JSON.parse(step.params)
     } catch (ex) {
-      this.logger.error('params parsing error. params must be a JSON.')
+      this.context.logger.error('params parsing error. params must be a JSON.')
     }
 
-    this.logger.info(`Step started. ${JSON.stringify(step)}`)
+    this.context.logger.info(`Step started. ${JSON.stringify(step)}`)
 
     var handler = TaskRegistry.getTaskHandler(step.task)
     if (!handler) {
       throw new Error(`no task handler for ${JSON.stringify(step)}`)
     } else {
-      var retval = await handler(step, context)
+      var retval: any = await handler(step, context)
     }
 
-    this.logger.info(`Step done.`)
+    this.context.logger.info(`Step done.`)
     return retval
   }
 }

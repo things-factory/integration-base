@@ -1,14 +1,23 @@
 import { TaskRegistry } from '../task-registry'
+import { Scenario } from '../../entities'
+import { getRepository } from 'typeorm'
 
-async function SubScenario(step, { logger, publish, data }) {
+async function SubScenario(step, { logger, load, data }) {
   var {
+    name,
     params: { scenario }
   } = step
 
-  /* 
-    Sub Scenario에 context-data passing과 return 방법을 고민하자.
-  */
-  logger.info('sub-scenario doing....')
+  var subscenario = await getRepository(Scenario).findOne({
+    where: {
+      id: scenario
+    },
+    relations: ['steps']
+  })
+
+  logger.info(`Sub Scenario '${subscenario.name}' Started.`)
+  await load(name, subscenario)
+  logger.info(`Sub Scenario '${subscenario.name}' done.`)
 
   return scenario
 }

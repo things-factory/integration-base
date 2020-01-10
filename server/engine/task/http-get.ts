@@ -33,7 +33,9 @@ async function HttpGet(step, { logger }) {
 
   logger.info(`http-get : \n${JSON.stringify(data, null, 2)}`)
 
-  return data
+  return {
+    data
+  }
 }
 
 HttpGet.parameterSpec = [

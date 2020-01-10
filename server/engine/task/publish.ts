@@ -7,7 +7,7 @@ async function Publish(step, { logger, publish, data }) {
 
   publish(tag, data[accessor])
 
-  return data
+  return { data }
 }
 
 Publish.parameterSpec = [

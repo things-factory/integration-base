@@ -16,7 +16,9 @@ async function EchoSend(step, { logger }) {
 
   logger.info(`echo-send : '${message}'`)
 
-  return retval
+  return {
+    data: retval
+  }
 }
 
 EchoSend.parameterSpec = [

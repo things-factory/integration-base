@@ -23,4 +23,27 @@ export interface Step {
   [propName: string]: any
 }
 
-export type TaskHandler = (step: Step, context: any) => void
+export enum SCENARIO_STATE {
+  READY,
+  STARTED,
+  PAUSED,
+  STOPPED,
+  HALTED
+}
+
+export type Context = {
+  logger: any
+  publish: Function
+  load: Function
+  state: SCENARIO_STATE
+  data: Object
+}
+
+export type TaskHandler = (
+  step: Step,
+  context: Context
+) => Promise<{
+  next?: string
+  state?: SCENARIO_STATE
+  data?: object
+}>
