@@ -1,20 +1,70 @@
 import { TaskRegistry } from '../task-registry'
 
-async function Switch(step, { logger }) {
+function getValue(accessor, o) {
+  var accessors = String(accessor)
+    .trim()
+    .replace(/\[(\w+)\]/g, '.$1')
+    .replace(/^\./, '')
+    .split('.')
+    .filter(accessor => !!accessor.trim())
+
+  return accessors.reduce((o, accessor) => (o ? o[accessor] : undefined), o)
+}
+
+async function Switch(step, { logger, data }) {
   var {
-    params: { goto }
+    params: { accessor, cases: jsonCases, defaultGoto }
   } = step
 
+  var value = getValue(accessor, data)
+  var cases = JSON.parse(jsonCases)
+  var goto = cases[value]
+
   return {
-    next: goto
+    next: goto === undefined ? defaultGoto : goto
   }
 }
 
 Switch.parameterSpec = [
   {
+    /*
+      data[httpget][xxx][yyy][zzz] => accessor
+      data[httpget][xxx][yyy][zzz].toString() => script
+    */
     type: 'string',
-    name: 'goto',
-    label: 'goto'
+    name: 'accessor',
+    label: 'accessor'
+  },
+  {
+    /*
+      {
+        'a': 'step 1',
+        'b': 'step 2',
+        10: 'step 3'
+      },
+
+      [{
+        key: 'a',
+        step: 'step 1'
+      }, {
+        key: 'b',
+        step: 'step 2'
+      }, {
+        key: 10,
+        step: 'step 3'
+      }, {
+        key: 11,
+        step: 
+      }]
+    */
+    type: 'json',
+    name: 'cases',
+    label: 'cases'
+  },
+  {
+    type: 'string',
+    name: 'defaultGoto',
+    label: 'defaultGoto'
   }
 ]
 
