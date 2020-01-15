@@ -57,7 +57,7 @@ Switch.parameterSpec = [
         step: 
       }]
     */
-    type: 'json',
+    type: 'textarea',
     name: 'cases',
     label: 'cases'
   },
