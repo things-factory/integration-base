@@ -2,7 +2,7 @@ import { getRepository } from 'typeorm'
 import { Scenario } from '../../../entities'
 
 export const startScenario = {
-  async startScenario(_: any, { name }, context: any, data?: any) {
+  async startScenario(_: any, { name, data }, context: any) {
     var repository = getRepository(Scenario)
     var scenario = await repository.findOne({
       where: { domain: context.state.domain, name },
