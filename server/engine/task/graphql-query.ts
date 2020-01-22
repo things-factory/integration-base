@@ -25,7 +25,7 @@ async function GraphqlQuery(step, { logger }) {
 
 GraphqlQuery.parameterSpec = [
   {
-    type: 'graphql',
+    type: 'textarea',
     name: 'query',
     label: 'query'
   }

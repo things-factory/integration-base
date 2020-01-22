@@ -25,7 +25,7 @@ async function GraphqlMutate(step, { logger }) {
 
 GraphqlMutate.parameterSpec = [
   {
-    type: 'graphql',
+    type: 'textarea',
     name: 'mutation',
     label: 'mutation'
   }
