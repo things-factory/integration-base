@@ -127,6 +127,7 @@ export class ScenarioEngine {
           }
         } else if (this.nextStep == this.steps.length - 1) {
           this.setState(SCENARIO_STATE.STOPPED)
+          this.nextStep = 0
           return
         } else {
           this.nextStep = this.nextStep + 1
