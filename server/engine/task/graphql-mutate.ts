@@ -2,9 +2,20 @@ import { TaskRegistry } from '../task-registry'
 import { Connections } from '../connections'
 import gql from 'graphql-tag'
 
-async function GraphqlMutate(step, { logger }) {
+async function GraphqlMutate(step, { logger, data }) {
   var { connection: connectionName, params: stepOptions } = step
   var { mutation } = stepOptions || {}
+
+  var vos = (mutation.match(/\${[^}]*}/gi) || []).map((key:any) => {
+    let value = eval(`data.${key.replace('$', '').replace('{', '').replace('}', '')}`)  // ex: ${stepName.object.value}
+
+    let vo = { key, value }
+    return vo
+  })
+
+  vos.forEach((vo:any) => {
+    mutation.replace(vo['key'], vo['value'])
+  })
 
   var client = Connections.getConnection(connectionName)
 
@@ -14,18 +25,18 @@ async function GraphqlMutate(step, { logger }) {
     `
   })
 
-  var data = response.data
+  var newData = response.data
 
-  logger.info(`graphql-mutate : \n${JSON.stringify(data, null, 2)}`)
+  logger.info(`graphql-mutate : \n${JSON.stringify(newData, null, 2)}`)
 
   return {
-    data
+    data: newData
   }
 }
 
 GraphqlMutate.parameterSpec = [
   {
-    type: 'graphql',
+    type: 'textarea',
     name: 'mutation',
     label: 'mutation'
   }

@@ -2,9 +2,19 @@ import { TaskRegistry } from '../task-registry'
 import { Connections } from '../connections'
 import gql from 'graphql-tag'
 
-async function GraphqlQuery(step, { logger }) {
+async function GraphqlQuery(step, { logger, data }) {
   var { connection: connectionName, params: stepOptions } = step
   var { query } = stepOptions || {}
+  var vos = (query.match(/\${[^}]*}/gi) || []).map((key:any) => {
+    let value = eval(`data.${key.replace('$', '').replace('{', '').replace('}', '')}`)  // ex: ${stepName.object.value}
+    
+    let vo = { key, value }
+    return vo
+  })
+
+  vos.forEach((vo:any) => {
+    query.replace(vo['key'], vo['value'])
+  })
 
   var client = Connections.getConnection(connectionName)
 
@@ -14,18 +24,18 @@ async function GraphqlQuery(step, { logger }) {
     `
   })
 
-  var data = response.data
+  var newData = response.data
 
-  logger.info(`graphql-query : \n${JSON.stringify(data, null, 2)}`)
+  logger.info(`graphql-query : \n${JSON.stringify(newData, null, 2)}`)
 
   return {
-    data
+    data: newData
   }
 }
 
 GraphqlQuery.parameterSpec = [
   {
-    type: 'graphql',
+    type: 'textarea',
     name: 'query',
     label: 'query'
   }
