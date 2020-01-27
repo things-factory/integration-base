@@ -16,7 +16,7 @@ async function Script(step, { logger, data }) {
 
 Script.parameterSpec = [
   {
-    type: 'javascript',
+    type: 'textarea',
     name: 'script',
     label: 'script'
   }
