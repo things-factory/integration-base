@@ -62,6 +62,11 @@ Switch.parameterSpec = [
     label: 'cases'
   },
   {
+    type: 'map',
+    name: 'switch',
+    label: 'switch'
+  },
+  {
     type: 'string',
     name: 'defaultGoto',
     label: 'defaultGoto'
@@ -69,3 +74,67 @@ Switch.parameterSpec = [
 ]
 
 TaskRegistry.registerTaskHandler('switch', Switch)
+
+async function SwitchRange(step, { logger, data }) {
+  var {
+    params: { accessor, cases: jsonCases, defaultGoto }
+  } = step
+
+  var value = getValue(accessor, data)
+  var cases = JSON.parse(jsonCases)
+  var goto = cases[value]
+
+  return {
+    next: goto === undefined ? defaultGoto : goto
+  }
+}
+
+SwitchRange.parameterSpec = [
+  {
+    /*
+      data[httpget][xxx][yyy][zzz] => accessor
+      data[httpget][xxx][yyy][zzz].toString() => script
+    */
+    type: 'string',
+    name: 'accessor',
+    label: 'accessor'
+  },
+  {
+    /*
+      {
+        'a': 'step 1',
+        'b': 'step 2',
+        10: 'step 3'
+      },
+
+      [{
+        key: 'a',
+        step: 'step 1'
+      }, {
+        key: 'b',
+        step: 'step 2'
+      }, {
+        key: 10,
+        step: 'step 3'
+      }, {
+        key: 11,
+        step: 
+      }]
+    */
+    type: 'textarea',
+    name: 'cases',
+    label: 'cases'
+  },
+  {
+    type: 'range',
+    name: 'switch',
+    label: 'switch'
+  },
+  {
+    type: 'string',
+    name: 'defaultGoto',
+    label: 'defaultGoto'
+  }
+]
+
+TaskRegistry.registerTaskHandler('switch-range', SwitchRange)
