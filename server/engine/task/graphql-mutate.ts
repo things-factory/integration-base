@@ -14,7 +14,7 @@ async function GraphqlMutate(step, { logger, data }) {
   })
 
   vos.forEach((vo:any) => {
-    mutation.replace(vo['key'], vo['value'])
+    mutation = mutation.replace(/${vo['key']}/g, vo['value'])
   })
 
   var client = Connections.getConnection(connectionName)
