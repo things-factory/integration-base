@@ -13,7 +13,7 @@ async function GraphqlQuery(step, { logger, data }) {
   })
 
   vos.forEach((vo:any) => {
-    query.replace(vo['key'], vo['value'])
+    query = query.replace(/${vo['key']}/g, vo['value'])
   })
 
   var client = Connections.getConnection(connectionName)
