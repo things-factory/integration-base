@@ -6,24 +6,32 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const task_registry_1 = require("../task-registry");
 const connections_1 = require("../connections");
 const graphql_tag_1 = __importDefault(require("graphql-tag"));
-async function GraphqlQuery(step, { logger }) {
+async function GraphqlQuery(step, { logger, data }) {
     var { connection: connectionName, params: stepOptions } = step;
     var { query } = stepOptions || {};
+    var vos = (query.match(/\${[^}]*}/gi) || []).map((key) => {
+        let value = eval(`data.${key.replace('$', '').replace('{', '').replace('}', '')}`); // ex: ${stepName.object.value}
+        let vo = { key, value };
+        return vo;
+    });
+    vos.forEach((vo) => {
+        query = query.replace(/${vo['key']}/g, vo['value']);
+    });
     var client = connections_1.Connections.getConnection(connectionName);
     var response = await client.query({
         query: graphql_tag_1.default `
       ${query}
     `
     });
-    var data = response.data;
-    logger.info(`graphql-query : \n${JSON.stringify(data, null, 2)}`);
+    var newData = response.data;
+    logger.info(`graphql-query : \n${JSON.stringify(newData, null, 2)}`);
     return {
-        data
+        data: newData
     };
 }
 GraphqlQuery.parameterSpec = [
     {
-        type: 'graphql',
+        type: 'textarea',
         name: 'query',
         label: 'query'
     }
