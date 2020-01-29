@@ -32,6 +32,7 @@ export enum SCENARIO_STATE {
 }
 
 export type Context = {
+  domain: Object
   logger: any
   publish: Function
   load: Function
