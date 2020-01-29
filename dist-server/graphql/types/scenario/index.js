@@ -29,6 +29,7 @@ exports.Mutation = `
 
   startScenario (
     name: String!
+    data: String
   ): Scenario
 
   stopScenario (
