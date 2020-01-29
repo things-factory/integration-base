@@ -8,14 +8,16 @@ async function GraphqlMutate(step, { logger, data }) {
 
   var vos = (mutation.match(/\${[^}]*}/gi) || []).map((key:any) => {
     if (data) {
-      let value = data[`${key.replace('$', '').replace('{', '').replace('}', '')}`]  // ex: ${stepName.object.key}
+      key = key.replace('$', '').replace('{', '').replace('}', '');
+      let value = eval(`data.${key}`)  // ex: ${stepName.object.key}
       let vo = { key, value }
       return vo
     }
   })
 
   vos.forEach((vo:any) => {
-    mutation = mutation.replace(/${vo['key']}/g, vo['value'])
+    let keyname = vo['key']
+    mutation = mutation.replace(new RegExp(`\\$\{${keyname}\}`, 'gi'), vo['value'])
   })
 
   var client = Connections.getConnection(connectionName)
