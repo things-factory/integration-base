@@ -6,10 +6,11 @@ async function GraphqlQuery(step, { logger, data }) {
   var { connection: connectionName, params: stepOptions } = step
   var { query } = stepOptions || {}
   var vos = (query.match(/\${[^}]*}/gi) || []).map((key:any) => {
-    let value = eval(`data.${key.replace('$', '').replace('{', '').replace('}', '')}`)  // ex: ${stepName.object.value}
-    
-    let vo = { key, value }
-    return vo
+    if (data) {
+      let value = data[`${key.replace('$', '').replace('{', '').replace('}', '')}`]  // ex: ${stepName.object.key}
+      let vo = { key, value }
+      return vo
+    }
   })
 
   vos.forEach((vo:any) => {

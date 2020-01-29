@@ -7,10 +7,11 @@ async function GraphqlMutate(step, { logger, data }) {
   var { mutation } = stepOptions || {}
 
   var vos = (mutation.match(/\${[^}]*}/gi) || []).map((key:any) => {
-    let value = eval(`data.${key.replace('$', '').replace('{', '').replace('}', '')}`)  // ex: ${stepName.object.value}
-
-    let vo = { key, value }
-    return vo
+    if (data) {
+      let value = data[`${key.replace('$', '').replace('{', '').replace('}', '')}`]  // ex: ${stepName.object.key}
+      let vo = { key, value }
+      return vo
+    }
   })
 
   vos.forEach((vo:any) => {
