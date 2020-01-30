@@ -180,7 +180,7 @@ export class ScenarioEngine {
         state: status[this.getState()],
         progress: {
           rounds: this.rounds,
-          rate: Math.round(100 * ((step + 1) / steps)),
+          rate: Math.round(100 * (step / steps)),
           steps,
           step
         },
