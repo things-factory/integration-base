@@ -13,59 +13,70 @@ function getValue(accessor, o) {
 
 async function Switch(step, { logger, data }) {
   var {
-    params: { accessor, cases: jsonCases, defaultGoto }
+    params: { accessor, cases }
   } = step
 
   var value = getValue(accessor, data)
-  var cases = JSON.parse(jsonCases)
-  var goto = cases[value]
+  // var cases = JSON.parse(jsonCases)
+  var next = cases[value] || cases['default']
 
   return {
-    next: goto === undefined ? defaultGoto : goto
+    next
   }
 }
 
 Switch.parameterSpec = [
   {
-    /*
-      data[httpget][xxx][yyy][zzz] => accessor
-      data[httpget][xxx][yyy][zzz].toString() => script
-    */
     type: 'string',
     name: 'accessor',
     label: 'accessor'
   },
   {
-    /*
-      {
-        'a': 'step 1',
-        'b': 'step 2',
-        10: 'step 3'
-      },
-
-      [{
-        key: 'a',
-        step: 'step 1'
-      }, {
-        key: 'b',
-        step: 'step 2'
-      }, {
-        key: 10,
-        step: 'step 3'
-      }, {
-        key: 11,
-        step: 
-      }]
-    */
-    type: 'textarea',
+    type: 'map',
     name: 'cases',
     label: 'cases'
-  },
-  {
-    type: 'string',
-    name: 'defaultGoto',
-    label: 'defaultGoto'
   }
 ]
 
 TaskRegistry.registerTaskHandler('switch', Switch)
+
+async function SwitchRange(step, { logger, data }) {
+  var {
+    params: { accessor, cases, defaultGoto }
+  } = step
+
+  var value = Number(getValue(accessor, data))
+  // var cases = JSON.parse(jsonCases)
+
+  var range =
+    Object.keys(cases).find(key => {
+      if (key == 'default') {
+        return
+      }
+
+      var [from, to] = key.split('~')
+
+      return Number(from) <= value && Number(to) > value
+    }) || 'default'
+
+  var next = cases[range]
+
+  return {
+    next
+  }
+}
+
+SwitchRange.parameterSpec = [
+  {
+    type: 'string',
+    name: 'accessor',
+    label: 'accessor'
+  },
+  {
+    type: 'range',
+    name: 'cases',
+    label: 'cases'
+  }
+]
+
+TaskRegistry.registerTaskHandler('switch-range', SwitchRange)

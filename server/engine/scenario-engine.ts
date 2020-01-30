@@ -1,6 +1,6 @@
 import { createLogger, format, transports } from 'winston'
 import 'winston-daily-rotate-file'
-import { pubsub } from '@things-factory/shell'
+import { Domain, pubsub } from '@things-factory/shell'
 import { sleep } from './utils'
 
 import { TaskRegistry } from './task-registry'
@@ -26,6 +26,7 @@ export class ScenarioEngine {
   private schedule: string
   private timezone: string
   private cronjob: CronJob
+  private domain: Domain
 
   private static logFormat = printf(({ level, message, timestamp }) => {
     return `${timestamp} ${level}: ${message}`
@@ -64,13 +65,15 @@ export class ScenarioEngine {
     SCENARIOS.forEach(scenario => ScenarioEngine.load(scenario))
   }
 
-  constructor({ name, steps, schedule = '', timezone = 'Asia/Seoul' }, context?, data?) {
+  constructor({ name, steps, schedule = '', timezone = 'Asia/Seoul', domain }, context?, data?) {
     this.name = name
     this.schedule = schedule
     this.timezone = timezone
     this.steps = steps || []
+    this.domain = domain
 
     this.context = context || {
+      domain,
       logger: createLogger({
         format: combine(timestamp(), splat(), ScenarioEngine.logFormat),
         transports: [
@@ -118,10 +121,6 @@ export class ScenarioEngine {
 
         this.publishState()
 
-        if (state !== undefined) {
-          this.setState(state)
-        }
-
         if (next) {
           this.nextStep = this.steps.findIndex(step => {
             return step.name == next
@@ -131,9 +130,12 @@ export class ScenarioEngine {
           }
         } else if (this.nextStep == this.steps.length - 1) {
           this.setState(SCENARIO_STATE.STOPPED)
-          return
         } else {
           this.nextStep = this.nextStep + 1
+        }
+
+        if (state !== undefined) {
+          this.setState(state)
         }
 
         await sleep(1)
@@ -149,6 +151,7 @@ export class ScenarioEngine {
 
     var scenario = new ScenarioEngine(scenarioConfig, {
       ...this.context,
+      name: `${this.name}$${scenarioConfig.name}`,
       data: this.context.data[stepName],
       state: SCENARIO_STATE.READY
     })
@@ -159,6 +162,7 @@ export class ScenarioEngine {
   publishData(tag, data) {
     pubsub.publish('publish-data', {
       publishData: {
+        domain: this.context.domain,
         tag,
         data
       }
@@ -171,6 +175,7 @@ export class ScenarioEngine {
 
     pubsub.publish('scenario-state', {
       scenarioState: {
+        domain: this.context.domain,
         name: this.name,
         state: status[this.getState()],
         progress: {
@@ -201,6 +206,10 @@ export class ScenarioEngine {
 
     this.context.logger.info(message)
     this.context.state = state
+
+    if (state == SCENARIO_STATE.STOPPED) {
+      this.nextStep = 0
+    }
 
     this.publishState(message)
   }

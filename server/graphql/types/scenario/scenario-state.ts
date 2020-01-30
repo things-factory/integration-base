@@ -17,6 +17,7 @@ export const ScenarioState = gql`
   }
 
   type ScenarioState {
+    domain: Domain
     name: String!
     state: ScenarioStatus!
     progress: Progress!
