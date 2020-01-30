@@ -19,12 +19,13 @@ export class SqliteConnector implements Connector {
       if (err) {
         logger.error(err.message)
       }
-      logger.info('The database connected.')
 
       Connections.addConnection(connection.name, {
         query: promisify(database.all.bind(database)),
         close: promisify(database.close.bind(database))
       })
+
+      logger.info(`SQLite Database(${connection.name}) at ${endpoint} connected.`)
     })
   }
 
@@ -32,7 +33,7 @@ export class SqliteConnector implements Connector {
     var database = Connections.getConnection(name)
     try {
       await database.close()
-      logger.log('The database connection closed.')
+      logger.info(`SQLite Database(${name}) closed.`)
     } catch (e) {
       logger.error(e)
     }

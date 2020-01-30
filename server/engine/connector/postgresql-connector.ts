@@ -12,8 +12,10 @@ export class PostgresqlConnector implements Connector {
   }
 
   async connect(connection) {
-    const { endpoint, params } = connection
-    const { user, password, database } = JSON.parse(params)
+    const {
+      endpoint,
+      params: { user, password, database }
+    } = connection
     const [host, port = 5432] = endpoint.split(':')
 
     const client = new Client({
@@ -33,14 +35,14 @@ export class PostgresqlConnector implements Connector {
       close: client.end.bind(client)
     })
 
-    logger.info('The database connected.')
+    logger.info(`PostgresSQL Database(${connection.name}:${database}) at ${endpoint} connected.`)
   }
 
   async disconnect(name) {
     var client = Connections.getConnection(name)
     try {
       await client.close()
-      logger.log('The database connection closed.')
+      logger.info(`PostgresSQL Database(${name}) closed.`)
     } catch (e) {
       logger.error(e)
     }

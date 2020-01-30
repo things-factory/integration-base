@@ -68,13 +68,21 @@ export class Connection {
   updater: User
 
   async connect() {
+    var connector = Connections.getConnector(this.type)
+    var params = {}
+
     try {
-      var connector = Connections.getConnector(this.type)
-      await connector.connect(this)
-      this.status = 1
+      params = JSON.parse(this.params || '{}')
     } catch (ex) {
-      this.status = 0
+      console.error(`connection '${this.name}' params should be JSON format`, ex)
     }
+
+    await connector.connect({
+      ...this,
+      params
+    })
+
+    this.status = 1
   }
 
   async disconnect() {

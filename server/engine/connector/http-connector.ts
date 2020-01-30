@@ -10,11 +10,7 @@ export class HttpConnector implements Connector {
   }
 
   async connect(connection) {
-    try {
-      var params = JSON.parse(connection.params)
-    } catch (e) {
-      logger.error(e)
-    }
+    var { params } = connection
 
     Connections.addConnection(connection.name, {
       ...connection,

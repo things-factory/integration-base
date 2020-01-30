@@ -9,16 +9,31 @@ export class Connections {
   private static connections = {}
 
   static async ready() {
-    const CONNECTIONS = await getRepository(Connection).find({
-      where: { active: true },
-      relations: ['domain', 'creator', 'updater']
+    const CONNECTIONS = (
+      await getRepository(Connection).find({
+        where: { active: true },
+        relations: ['domain', 'creator', 'updater']
+      })
+    ).map(connection => {
+      var params = {}
+      try {
+        params = JSON.parse(connection.params || '{}')
+      } catch (ex) {
+        logger.error(`connection '${connection.name}' params should be JSON format`)
+        logger.error(ex)
+      }
+
+      return {
+        ...connection,
+        params
+      }
     })
 
     return Promise.all(
       Object.keys(Connections.connectors).map(type => {
         var connector = Connections.connectors[type]
 
-        return connector.ready(CONNECTIONS.filter(connection => connection.type == type)).catch(error => {
+        return connector.ready(CONNECTIONS.filter(connection => connection.type == type) as any).catch(error => {
           logger.error(error.message)
         })
       })

@@ -180,7 +180,7 @@ export class ScenarioEngine {
         state: status[this.getState()],
         progress: {
           rounds: this.rounds,
-          rate: Math.round(100 * (step / steps)),
+          rate: Math.round(100 * ((step + 1) / steps)),
           steps,
           step
         },
@@ -242,6 +242,8 @@ export class ScenarioEngine {
   }
 
   async process(step, context): Promise<{ next: string; state: SCENARIO_STATE; data: object }> {
+    this.context.logger.info(`Step '${step.name}'(${step.id}) started.`)
+
     step = {
       ...step
     } // copy step
@@ -249,14 +251,12 @@ export class ScenarioEngine {
     try {
       step.params = JSON.parse(step.params)
     } catch (ex) {
-      this.context.logger.error('params parsing error. params must be a JSON.')
+      this.context.logger.error(`params(${step.params}) parsing error. params must be a JSON.`)
     }
-
-    this.context.logger.info(`Step started. ${JSON.stringify(step)}`)
 
     var handler = TaskRegistry.getTaskHandler(step.task)
     if (!handler) {
-      throw new Error(`no task handler for ${JSON.stringify(step)}`)
+      throw new Error(`no task handler for step '${step.name}'(${step.id})`)
     } else {
       var retval: any = await handler(step, context)
     }

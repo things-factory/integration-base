@@ -17,7 +17,7 @@ async function Switch(step, { logger, data }) {
   } = step
 
   var value = getValue(accessor, data)
-  // var cases = JSON.parse(jsonCases)
+
   var next = cases[value] || cases['default']
 
   return {
@@ -46,7 +46,6 @@ async function SwitchRange(step, { logger, data }) {
   } = step
 
   var value = Number(getValue(accessor, data))
-  // var cases = JSON.parse(jsonCases)
 
   var range =
     Object.keys(cases).find(key => {
