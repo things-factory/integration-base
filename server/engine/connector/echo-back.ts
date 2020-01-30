@@ -31,7 +31,7 @@ export class EchoBack implements Connector {
     let [host, port = 8124] = connection.endpoint.split(':')
     let { timeout = 30000 } = connection.params || {}
 
-    socket.setTimeout(timeout)
+    socket.setTimeout(Number(timeout))
     await socket.connect(port, host)
     Connections.addConnection(connection.name, socket)
   }
