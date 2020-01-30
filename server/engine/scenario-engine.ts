@@ -36,11 +36,11 @@ export class ScenarioEngine {
     return scenarios[name]
   }
 
-  public static async load(scenarioConfig) {
+  public static async load(scenarioConfig, data?: any) {
     if (scenarios[scenarioConfig.name]) {
       return
     }
-    var scenario = new ScenarioEngine(scenarioConfig)
+    var scenario = new ScenarioEngine(scenarioConfig, undefined, data)
     scenario.start()
 
     scenarios[scenarioConfig.name] = scenario
@@ -65,7 +65,7 @@ export class ScenarioEngine {
     SCENARIOS.forEach(scenario => ScenarioEngine.load(scenario))
   }
 
-  constructor({ name, steps, schedule = '', timezone = 'Asia/Seoul', domain }, context?) {
+  constructor({ name, steps, schedule = '', timezone = 'Asia/Seoul', domain }, context?, data?) {
     this.name = name
     this.schedule = schedule
     this.timezone = timezone
@@ -91,6 +91,10 @@ export class ScenarioEngine {
       load: this.loadSubscenario.bind(this),
       data: {},
       state: SCENARIO_STATE.READY
+    }
+
+    if (data) {
+      this.context.data = data
     }
   }
 
