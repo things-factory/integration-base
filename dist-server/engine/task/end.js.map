@@ -1,1 +1,0 @@
-{"version":3,"file":"end.js","sourceRoot":"","sources":["../../../server/engine/task/end.ts"],"names":[],"mappings":";;AAAA,oDAA+C;AAC/C,oCAAyC;AAEzC,KAAK,UAAU,GAAG,CAAC,IAAI,EAAE,EAAE,MAAM,EAAE;IACjC,OAAO;QACL,KAAK,EAAE,sBAAc,CAAC,OAAO;KAC9B,CAAA;AACH,CAAC;AAED,GAAG,CAAC,aAAa,GAAG,EAAE,CAAA;AAEtB,4BAAY,CAAC,mBAAmB,CAAC,KAAK,EAAE,GAAG,CAAC,CAAA"}

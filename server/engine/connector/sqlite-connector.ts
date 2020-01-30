@@ -1,8 +1,8 @@
 import { logger } from '@things-factory/env'
 import { Connector } from '../types'
 import { Connections } from '../connections'
+import { promisify } from 'util'
 
-const util = require('util')
 const sqlite3 = require('sqlite3').verbose()
 
 export class SqliteConnector implements Connector {
@@ -22,8 +22,8 @@ export class SqliteConnector implements Connector {
       logger.info('The database connected.')
 
       Connections.addConnection(connection.name, {
-        query: util.promisify(database.all.bind(database)),
-        close: util.promisify(database.close.bind(database))
+        query: promisify(database.all.bind(database)),
+        close: promisify(database.close.bind(database))
       })
     })
   }

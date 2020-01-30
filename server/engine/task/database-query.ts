@@ -7,9 +7,9 @@ async function DatabaseQuery(step, { logger, data }) {
     params: { query }
   } = step
 
-  var database = Connections.getConnection(connectionName)
+  var dbconnection = Connections.getConnection(connectionName)
 
-  var data = await database.query(query, [])
+  var data = await dbconnection.query(query, [])
 
   logger.info(JSON.stringify(data, null, 2))
 
