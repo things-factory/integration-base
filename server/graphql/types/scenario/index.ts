@@ -28,6 +28,7 @@ export const Mutation = `
 
   startScenario (
     name: String!
+    data: String
   ): Scenario
 
   stopScenario (
