@@ -12,10 +12,8 @@ export class PostgresqlConnector implements Connector {
   }
 
   async connect(connection) {
-    const {
-      endpoint,
-      params: { user, password, database }
-    } = connection
+    const { endpoint, params } = connection
+    const { user, password, database } = JSON.parse(params)
     const [host, port = 5432] = endpoint.split(':')
 
     const client = new Client({
@@ -29,7 +27,9 @@ export class PostgresqlConnector implements Connector {
     await client.connect()
 
     Connections.addConnection(connection.name, {
-      query: client.query.bind(client),
+      query: async (query, params) => {
+        return (await client.query(query, params)).rows
+      },
       close: client.end.bind(client)
     })
 
