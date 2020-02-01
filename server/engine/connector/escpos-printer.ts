@@ -48,13 +48,13 @@ export class ESCPOSPrinter implements Connector {
       },
       {
         type: 'string',
-        label: 'vendor id',
+        label: 'vendor-id',
         placeholder: '0x0483',
         name: 'vendorId'
       },
       {
         type: 'string',
-        label: 'product id',
+        label: 'product-id',
         placeholder: '0x5743',
         name: 'productId'
       }
