@@ -12,7 +12,7 @@ export class ESCPOSPrinter implements Connector {
 
   async connect(connection) {
     const {
-      encoding = 'KS_C_5601-1987',
+      encoding = 'EUC-KR',
       vendorId = 0x0483 /* STMicroelectronics */,
       productId = 0x5743 /* XPrinter Product ? */
     } = connection.params
@@ -43,7 +43,7 @@ export class ESCPOSPrinter implements Connector {
         label: 'encoding',
         name: 'encoding',
         property: {
-          options: ['', 'KS_C_5601-1987', 'GB18030']
+          options: ['', 'EUC-KR', 'GB18030']
         }
       },
       {
