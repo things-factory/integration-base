@@ -46,5 +46,5 @@ export type TaskHandler = (
 ) => Promise<{
   next?: string
   state?: SCENARIO_STATE
-  data?: object
+  data?: any
 }>

@@ -32,6 +32,7 @@
     "@things-factory/shell": "^2.0.0",
     "cron": "^1.7.2",
     "cross-fetch": "^3.0.4",
+    "escpos": "^2.5.2",
     "moment-timezone": "^0.5.27",
     "mqtt": "^3.0.0",
     "node-fetch": "^2.6.0",
