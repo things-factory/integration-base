@@ -38,6 +38,8 @@ export type Context = {
   load: Function
   state: SCENARIO_STATE
   data: Object
+  variables: Object
+  client: Object /* graphql local client */
 }
 
 export type TaskHandler = (

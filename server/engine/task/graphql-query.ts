@@ -2,20 +2,24 @@ import { TaskRegistry } from '../task-registry'
 import { Connections } from '../connections'
 import gql from 'graphql-tag'
 
-async function GraphqlQuery(step, { logger, data }) {
+async function GraphqlQuery(step, context) {
   var { connection: connectionName, params: stepOptions } = step
   var { query } = stepOptions || {}
-  
-  var vos = (query.match(/\${[^}]*}/gi) || []).map((key:any) => {
-    if (data) {
-      key = key.replace('$', '').replace('{', '').replace('}', '');
-      let value = eval(`data.${key}`)  // ex: ${stepName.object.key}
+  var { logger } = context
+
+  var vos = (query.match(/\${[^}]*}/gi) || []).map((key: any) => {
+    if (context) {
+      key = key
+        .replace('$', '')
+        .replace('{', '')
+        .replace('}', '')
+      let value = eval(`context.${key}`) // ex: ${stepName.object.key}
       let vo = { key, value }
       return vo
     }
   })
 
-  vos.forEach((vo:any) => {
+  vos.forEach((vo: any) => {
     let keyname = vo['key']
     query = query.replace(new RegExp(`\\$\{${keyname}\}`, 'gi'), vo['value'])
   })

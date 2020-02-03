@@ -73,9 +73,9 @@ export class Scenario {
   })
   updater: User
 
-  async start(initData?: any) {
+  async start(variables?: any) {
     try {
-      await ScenarioEngine.load(this, initData)
+      await ScenarioEngine.load(this, { variables })
       this.status = 1
     } catch (ex) {
       this.status = 0

@@ -17,6 +17,7 @@ const { combine, timestamp, splat, printf } = format
 const status = ['READY', 'STARTED', 'PAUSED', 'STOPPED', 'HALTED']
 
 export class ScenarioEngine {
+  private static _client: Object
   private name: string
   private steps: Step[]
   private rounds: number = 0
@@ -36,11 +37,11 @@ export class ScenarioEngine {
     return scenarios[name]
   }
 
-  public static async load(scenarioConfig, data?: any) {
+  public static async load(scenarioConfig, context?) {
     if (scenarios[scenarioConfig.name]) {
       return
     }
-    var scenario = new ScenarioEngine(scenarioConfig, undefined, data)
+    var scenario = new ScenarioEngine(scenarioConfig, context)
     scenario.start()
 
     scenarios[scenarioConfig.name] = scenario
@@ -56,6 +57,14 @@ export class ScenarioEngine {
     delete scenarios[name]
   }
 
+  public static set client(client) {
+    ScenarioEngine._client = client
+  }
+
+  public static get client() {
+    return ScenarioEngine._client
+  }
+
   public static async loadAll() {
     const SCENARIOS = await getRepository(Scenario).find({
       where: { active: true },
@@ -65,36 +74,36 @@ export class ScenarioEngine {
     SCENARIOS.forEach(scenario => ScenarioEngine.load(scenario))
   }
 
-  constructor({ name, steps, schedule = '', timezone = 'Asia/Seoul', domain }, context?, data?) {
+  constructor({ name, steps, schedule = '', timezone = 'Asia/Seoul', domain }, context?) {
     this.name = name
     this.schedule = schedule
     this.timezone = timezone
     this.steps = steps || []
     this.domain = domain
 
-    this.context = context || {
+    this.context = {
       domain,
-      logger: createLogger({
-        format: combine(timestamp(), splat(), ScenarioEngine.logFormat),
-        transports: [
-          new (transports as any).DailyRotateFile({
-            filename: `logs/scenario-${name}-%DATE%.log`,
-            datePattern: 'YYYY-MM-DD-HH',
-            zippedArchive: false,
-            maxSize: '20m',
-            maxFiles: '14d',
-            level: 'info'
-          })
-        ]
-      }),
-      publish: this.publishData.bind(this),
-      load: this.loadSubscenario.bind(this),
-      data: {},
+      logger:
+        context.logger ||
+        createLogger({
+          format: combine(timestamp(), splat(), ScenarioEngine.logFormat),
+          transports: [
+            new (transports as any).DailyRotateFile({
+              filename: `logs/scenario-${name}-%DATE%.log`,
+              datePattern: 'YYYY-MM-DD-HH',
+              zippedArchive: false,
+              maxSize: '20m',
+              maxFiles: '14d',
+              level: 'info'
+            })
+          ]
+        }),
+      publish: context.publish || this.publishData.bind(this),
+      load: context.load || this.loadSubscenario.bind(this),
+      data: context.data || {},
+      variables: context.variables || {},
+      client: ScenarioEngine.client,
       state: SCENARIO_STATE.READY
-    }
-
-    if (data) {
-      this.context.data = data
     }
   }
 

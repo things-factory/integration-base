@@ -3,16 +3,20 @@ import { Connections } from '../connections'
 // import { schema } from '@things-factory/shell/dist-server/schema'
 import gql from 'graphql-tag'
 
-async function LocalGraphqlMutate(step, { logger }) {
+async function LocalGraphqlMutate(step, context) {
   var { connection: connectionName, params: stepOptions } = step
   var { mutation } = stepOptions || {}
-
-  var client = Connections.getConnection(connectionName)
+  var { logger, client, domain } = context
 
   var response = await client.mutate({
     mutation: gql`
       ${mutation}
-    `
+    `,
+    context: {
+      state: {
+        domain
+      }
+    }
   })
 
   var data = response.data
@@ -26,7 +30,7 @@ async function LocalGraphqlMutate(step, { logger }) {
 
 LocalGraphqlMutate.parameterSpec = [
   {
-    type: 'graphql',
+    type: 'textarea',
     name: 'mutation',
     label: 'mutation'
   }
