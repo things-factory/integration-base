@@ -11,8 +11,9 @@ export const scenariosResolver = {
       relations: ['domain', 'steps', 'creator', 'updater']
     })
 
+    /* TODO scenario-instance 엔티티 개념이 필요하다. */
     items.forEach(scenario => {
-      scenario.status = ScenarioEngine.getScenario(scenario.name) ? 1 : 0
+      scenario.status = ScenarioEngine.getScenarioInstance(scenario.name) ? 1 : 0
     })
 
     return { items, total }

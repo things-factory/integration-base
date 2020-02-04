@@ -10,59 +10,57 @@ import { getRepository } from 'typeorm'
 import { Scenario } from '../entities'
 import { CronJob } from 'cron'
 
-const scenarios = {}
-
 const { combine, timestamp, splat, printf } = format
 
 const status = ['READY', 'STARTED', 'PAUSED', 'STOPPED', 'HALTED']
 
 export class ScenarioEngine {
-  private static _client: Object
-  private name: string
+  public static client: Object
+  private static scenarioInstances = {}
+
+  public domain: Domain
+  public scenarioName: string
+  public instanceName: string
+  public context: Context
+
   private steps: Step[]
   private rounds: number = 0
   private message: string
   private nextStep: number = 0
-  private context: Context
   private schedule: string
   private timezone: string
   private cronjob: CronJob
-  private domain: Domain
 
   private static logFormat = printf(({ level, message, timestamp }) => {
     return `${timestamp} ${level}: ${message}`
   })
 
-  public static getScenario(name) {
-    return scenarios[name]
+  public static getScenarioInstance(instanceName) {
+    return ScenarioEngine.scenarioInstances[instanceName]
   }
 
-  public static async load(scenarioConfig, context?) {
-    if (scenarios[scenarioConfig.name]) {
+  public static getScenarioInstances() {
+    return Object.values(ScenarioEngine.scenarioInstances)
+  }
+
+  public static async load(instanceName, scenarioConfig, context?) {
+    if (ScenarioEngine.scenarioInstances[instanceName]) {
       return
     }
-    var scenario = new ScenarioEngine(scenarioConfig, context)
-    scenario.start()
+    var instance = new ScenarioEngine(instanceName, scenarioConfig, context)
+    instance.start()
 
-    scenarios[scenarioConfig.name] = scenario
+    ScenarioEngine.scenarioInstances[instanceName] = instance
   }
 
-  public static async unload(name) {
-    var scenario = scenarios[name]
-    if (!scenario) {
+  public static async unload(instanceName) {
+    var instance = ScenarioEngine.scenarioInstances[instanceName]
+    if (!instance) {
       return
     }
-    scenario.stop()
+    instance.stop()
 
-    delete scenarios[name]
-  }
-
-  public static set client(client) {
-    ScenarioEngine._client = client
-  }
-
-  public static get client() {
-    return ScenarioEngine._client
+    delete ScenarioEngine.scenarioInstances[instanceName]
   }
 
   public static async loadAll() {
@@ -71,11 +69,12 @@ export class ScenarioEngine {
       relations: ['domain', 'creator', 'updater', 'steps']
     })
 
-    SCENARIOS.forEach(scenario => ScenarioEngine.load(scenario))
+    SCENARIOS.forEach(scenario => ScenarioEngine.load(scenario.name, scenario))
   }
 
-  constructor({ name, steps, schedule = '', timezone = 'Asia/Seoul', domain }, context?) {
-    this.name = name
+  constructor(instanceName, { name: scenarioName, steps, schedule = '', timezone = 'Asia/Seoul', domain }, context?) {
+    this.instanceName = instanceName
+    this.scenarioName = scenarioName
     this.schedule = schedule
     this.timezone = timezone
     this.steps = steps || []
@@ -89,7 +88,7 @@ export class ScenarioEngine {
           format: combine(timestamp(), splat(), ScenarioEngine.logFormat),
           transports: [
             new (transports as any).DailyRotateFile({
-              filename: `logs/scenario-${name}-%DATE%.log`,
+              filename: `logs/scenario-${instanceName}-%DATE%.log`,
               datePattern: 'YYYY-MM-DD-HH',
               zippedArchive: false,
               maxSize: '20m',
@@ -158,14 +157,13 @@ export class ScenarioEngine {
   async loadSubscenario(stepName, scenarioConfig) {
     this.context.data[stepName] = {}
 
-    var scenario = new ScenarioEngine(scenarioConfig, {
+    var subScenarioInstance = new ScenarioEngine(`${this.instanceName}$${stepName}`, scenarioConfig, {
       ...this.context,
-      name: `${this.name}$${scenarioConfig.name}`,
       data: this.context.data[stepName],
       state: SCENARIO_STATE.READY
     })
 
-    await scenario.run()
+    await subScenarioInstance.run()
   }
 
   publishData(tag, data) {
@@ -185,7 +183,7 @@ export class ScenarioEngine {
     pubsub.publish('scenario-state', {
       scenarioState: {
         domain: this.context.domain,
-        name: this.name,
+        name: this.instanceName /* TODO SubScenario 의 publish도 메인프로세스 이름으로 받을 수 있게 하자. */,
         state: status[this.getState()],
         progress: {
           rounds: this.rounds,

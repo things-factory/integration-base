@@ -10,11 +10,16 @@ import { deleteScenarios } from './delete-scenarios'
 import { startScenario } from './start-scenario'
 import { stopScenario } from './stop-scenario'
 
+import { scenarioInstanceResolver } from './scenario-instance'
+import { scenarioInstancesResolver } from './scenario-instances'
+
 import { scenarioState } from './scenario-state'
 
 export const Query = {
   ...scenariosResolver,
-  ...scenarioResolver
+  ...scenarioResolver,
+  ...scenarioInstancesResolver,
+  ...scenarioInstanceResolver
 }
 
 export const Mutation = {

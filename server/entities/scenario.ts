@@ -73,18 +73,18 @@ export class Scenario {
   })
   updater: User
 
-  async start(variables?: any) {
+  async start(instanceName, variables?: any) {
     try {
-      await ScenarioEngine.load(this, { variables })
+      await ScenarioEngine.load(instanceName || this.name, this, { variables })
       this.status = 1
     } catch (ex) {
       this.status = 0
     }
   }
 
-  async stop() {
+  async stop(instanceName?) {
     try {
-      await ScenarioEngine.unload(this.name)
+      await ScenarioEngine.unload(instanceName || this.name)
     } finally {
       this.status = 0
     }
