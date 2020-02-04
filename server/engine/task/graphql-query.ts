@@ -7,23 +7,25 @@ async function GraphqlQuery(step, context) {
   var { query } = stepOptions || {}
   var { logger } = context
 
-  var vos = (query.match(/\${[^}]*}/gi) || []).map((key: any) => {
-    if (context) {
-      key = key
-        .replace('$', '')
-        .replace('{', '')
-        .replace('}', '')
-      let value = eval(`context.${key}`) // ex: ${stepName.object.key}
-      let vo = { key, value }
-      return vo
-    }
-  })
+  // var vos = (query.match(/\${[^}]*}/gi) || []).map((key: any) => {
+  //   if (context) {
+  //     key = key
+  //       .replace('$', '')
+  //       .replace('{', '')
+  //       .replace('}', '')
+  //     let value = eval(`context.${key}`) // ex: ${stepName.object.key}
+  //     let vo = { key, value }
+  //     return vo
+  //   }
+  // })
 
-  vos.forEach((vo: any) => {
-    let keyname = vo['key']
-    query = query.replace(new RegExp(`\\$\{${keyname}\}`, 'gi'), vo['value'])
-  })
+  // vos.forEach((vo: any) => {
+  //   let keyname = vo['key']
+  //   query = query.replace(new RegExp(`\\$\{${keyname}\}`, 'gi'), vo['value'])
+  // })
 
+  query = new Function(`return \`${query}\`;`).apply(context)
+  
   var client = Connections.getConnection(connectionName)
 
   var response = await client.query({

@@ -8,6 +8,8 @@ async function LocalGraphqlQuery(step, context) {
   var { query } = stepOptions || {}
   var { logger, client, domain } = context
 
+  query = new Function(`return \`${query}\`;`).apply(context)
+
   var response = await client.query({
     query: gql`
       ${query}

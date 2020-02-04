@@ -8,6 +8,8 @@ async function LocalGraphqlMutate(step, context) {
   var { mutation } = stepOptions || {}
   var { logger, client, domain } = context
 
+  mutation = new Function(`return \`${mutation}\`;`).apply(context)
+
   var response = await client.mutate({
     mutation: gql`
       ${mutation}
