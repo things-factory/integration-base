@@ -40,6 +40,7 @@ export type Context = {
   data: Object
   variables: Object
   client: Object /* graphql local client */
+  root: Object
 }
 
 export type TaskHandler = (

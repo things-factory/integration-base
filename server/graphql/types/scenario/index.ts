@@ -4,7 +4,6 @@ import { ScenarioPatch } from './scenario-patch'
 import { ScenarioList } from './scenario-list'
 import { ScenarioInstance } from './scenario-instance'
 import { ScenarioInstanceList } from './scenario-instance-list'
-import { ScenarioState } from './scenario-state'
 
 export const Mutation = `
   createScenario (
@@ -47,15 +46,7 @@ export const Query = `
 `
 
 export const Subscription = `
-  scenarioState(name: String): ScenarioState
+  scenarioInstanceState(instanceName: String, scenarioName: String): ScenarioInstance
 `
 
-export const Types = [
-  Scenario,
-  NewScenario,
-  ScenarioPatch,
-  ScenarioList,
-  ScenarioState,
-  ScenarioInstance,
-  ScenarioInstanceList
-]
+export const Types = [Scenario, NewScenario, ScenarioPatch, ScenarioList, ScenarioInstance, ScenarioInstanceList]

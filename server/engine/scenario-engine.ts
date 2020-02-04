@@ -12,7 +12,7 @@ import { CronJob } from 'cron'
 
 const { combine, timestamp, splat, printf } = format
 
-const status = ['READY', 'STARTED', 'PAUSED', 'STOPPED', 'HALTED']
+export const ScenarioStatus = ['READY', 'STARTED', 'PAUSED', 'STOPPED', 'HALTED']
 
 export class ScenarioEngine {
   public static client: Object
@@ -102,7 +102,8 @@ export class ScenarioEngine {
       data: context.data || {},
       variables: context.variables || {},
       client: ScenarioEngine.client,
-      state: SCENARIO_STATE.READY
+      state: SCENARIO_STATE.READY,
+      root: context.root || this
     }
   }
 
@@ -177,23 +178,36 @@ export class ScenarioEngine {
   }
 
   publishState(message?) {
+    /* root scenario instance 만 publish state하도록 한다. */
+    if (this.context.root === this) {
+      pubsub.publish('scenario-instance-state', {
+        scenarioInstanceState: {
+          domain: this.context.domain,
+          scenarioName: this.scenarioName,
+          instanceName: this.instanceName,
+          state: ScenarioStatus[this.getState()],
+          progress: this.progress,
+          data: { ...this.context.data },
+          variables: { ...this.context.variables },
+          message,
+          timestamp: String(Date.now())
+        }
+      })
+    } else {
+      ;(this.context.root as ScenarioEngine).publishState(message)
+    }
+  }
+
+  get progress() {
     var steps = this.steps.length
     var step = this.nextStep
 
-    pubsub.publish('scenario-state', {
-      scenarioState: {
-        domain: this.context.domain,
-        name: this.instanceName /* TODO SubScenario 의 publish도 메인프로세스 이름으로 받을 수 있게 하자. */,
-        state: status[this.getState()],
-        progress: {
-          rounds: this.rounds,
-          rate: Math.round(100 * (step / steps)),
-          steps,
-          step
-        },
-        message
-      }
-    })
+    return {
+      rounds: this.rounds,
+      rate: Math.round(100 * (step / steps)),
+      steps,
+      step
+    }
   }
 
   getState(): SCENARIO_STATE {
@@ -205,7 +219,7 @@ export class ScenarioEngine {
       return
     }
 
-    var message = `[state changed] ${status[this.getState()]} => ${status[state]}${
+    var message = `[state changed] ${ScenarioStatus[this.getState()]} => ${ScenarioStatus[state]}${
       this.message ? ' caused by ' + this.message : ''
     }`
 

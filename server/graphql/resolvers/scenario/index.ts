@@ -13,7 +13,7 @@ import { stopScenario } from './stop-scenario'
 import { scenarioInstanceResolver } from './scenario-instance'
 import { scenarioInstancesResolver } from './scenario-instances'
 
-import { scenarioState } from './scenario-state'
+import { scenarioInstanceState } from './scenario-instance-state'
 
 export const Query = {
   ...scenariosResolver,
@@ -33,5 +33,5 @@ export const Mutation = {
 }
 
 export const Subscription = {
-  ...scenarioState
+  ...scenarioInstanceState
 }

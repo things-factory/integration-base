@@ -1,12 +1,12 @@
 import { TaskRegistry } from '../task-registry'
 
-async function Script(step, { logger, data }) {
+async function Script(step, context) {
   var {
     params: { script }
   } = step
+  var { logger } = context || {}
 
-  var func = new Function('data', script)
-  var result = func(data)
+  var result = new Function(script).apply(context)
   logger.info(`script done: ${result}`)
 
   return {
