@@ -42,8 +42,8 @@ export const Mutation = `
 export const Query = `
   scenarios(filters: [Filter], pagination: Pagination, sortings: [Sorting]): ScenarioList
   scenario(id: String!): Scenario
-  scenarioInstances(filter: [Filter], pagination: Pagination, sortings: [Sorting]): ScenarioInstanceList
-  scenarioInstance(name: String!): ScenarioInstance
+  scenarioInstances(filters: [Filter], pagination: Pagination, sortings: [Sorting]): ScenarioInstanceList
+  scenarioInstance(instanceName: String!): ScenarioInstance
 `
 
 export const Subscription = `

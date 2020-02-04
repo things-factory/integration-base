@@ -1,10 +1,13 @@
 import { ScenarioEngine } from '../../../engine/scenario-engine'
+import { ListParam, convertListParams } from '@things-factory/shell'
 
 export const scenarioInstancesResolver = {
-  scenarioInstances(_: any, {}, context: any) {
+  scenarioInstances(_: any, params: ListParam, context: any) {
     var scenarioInstances = ScenarioEngine.getScenarioInstances()
-    var items = Object.keys(scenarioInstances).map(name => {
-      var { domain, instanceName, scenarioName, context } = ScenarioEngine.getScenarioInstance(name)
+    const convertedParams = convertListParams(params, context.state.domain.id)
+
+    var items = scenarioInstances.map(instance => {
+      var { domain, instanceName, scenarioName, context } = instance
       var { variables, data, state } = context || {}
 
       return {

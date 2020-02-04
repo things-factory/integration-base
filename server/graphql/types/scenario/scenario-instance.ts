@@ -5,7 +5,7 @@ export const ScenarioInstance = gql`
     domain: Domain
     instanceName: String
     scenarioName: String
-    state: ScenarioStatus
+    state: Int
     data: Object
     variables: Object
   }

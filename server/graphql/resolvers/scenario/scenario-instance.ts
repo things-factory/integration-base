@@ -1,8 +1,9 @@
 import { ScenarioEngine } from '../../../engine/scenario-engine'
+import { Context } from '../../../engine/types'
 
 export const scenarioInstanceResolver = {
-  scenarioInstance(_: any, { name }, context: any) {
-    var { domain, instanceName, scenarioName, context } = ScenarioEngine.getScenarioInstance(name)
+  scenarioInstance(_: any, { instanceName }, context: any) {
+    var { domain, scenarioName, context: Context } = ScenarioEngine.getScenarioInstance(instanceName)
     var { variables, data, state } = context || {}
 
     return {

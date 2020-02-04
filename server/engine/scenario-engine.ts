@@ -35,11 +35,11 @@ export class ScenarioEngine {
     return `${timestamp} ${level}: ${message}`
   })
 
-  public static getScenarioInstance(instanceName) {
+  public static getScenarioInstance(instanceName): ScenarioEngine {
     return ScenarioEngine.scenarioInstances[instanceName]
   }
 
-  public static getScenarioInstances() {
+  public static getScenarioInstances(): ScenarioEngine[] {
     return Object.values(ScenarioEngine.scenarioInstances)
   }
 
