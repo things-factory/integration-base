@@ -31,11 +31,11 @@ export const Mutation = `
     instanceName: String
     scenarioName: String!
     variables: Object
-  ): Scenario
+  ): ScenarioInstance
 
   stopScenario (
     instanceName: String!
-  ): Scenario
+  ): ScenarioInstance
 `
 
 export const Query = `

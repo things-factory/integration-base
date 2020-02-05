@@ -12,7 +12,7 @@ import { CronJob } from 'cron'
 
 const { combine, timestamp, splat, printf } = format
 
-export const ScenarioStatus = ['READY', 'STARTED', 'PAUSED', 'STOPPED', 'HALTED']
+export const ScenarioInstanceStatus = ['READY', 'STARTED', 'PAUSED', 'STOPPED', 'HALTED']
 
 export class ScenarioEngine {
   public static client: Object
@@ -44,13 +44,17 @@ export class ScenarioEngine {
   }
 
   public static async load(instanceName, scenarioConfig, context?) {
-    if (ScenarioEngine.scenarioInstances[instanceName]) {
-      return
+    var scenarioInstance = ScenarioEngine.scenarioInstances[instanceName]
+    if (scenarioInstance) {
+      return scenarioInstance
     }
+
     var instance = new ScenarioEngine(instanceName, scenarioConfig, context)
     instance.start()
 
     ScenarioEngine.scenarioInstances[instanceName] = instance
+
+    return instance
   }
 
   public static async unload(instanceName) {
@@ -185,7 +189,7 @@ export class ScenarioEngine {
           domain: this.context.domain,
           scenarioName: this.scenarioName,
           instanceName: this.instanceName,
-          state: ScenarioStatus[this.getState()],
+          state: ScenarioInstanceStatus[this.getState()],
           progress: this.progress,
           data: { ...this.context.data },
           variables: { ...this.context.variables },
@@ -219,7 +223,7 @@ export class ScenarioEngine {
       return
     }
 
-    var message = `[state changed] ${ScenarioStatus[this.getState()]} => ${ScenarioStatus[state]}${
+    var message = `[state changed] ${ScenarioInstanceStatus[this.getState()]} => ${ScenarioInstanceStatus[state]}${
       this.message ? ' caused by ' + this.message : ''
     }`
 

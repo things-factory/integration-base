@@ -1,10 +1,9 @@
-import { ScenarioEngine, ScenarioStatus } from '../../../engine/scenario-engine'
-import { Context } from '../../../engine/types'
+import { ScenarioEngine, ScenarioInstanceStatus } from '../../../engine/scenario-engine'
 
 export const scenarioInstanceResolver = {
   scenarioInstance(_: any, { instanceName }, context: any) {
-    var { domain, scenarioName, context: Context, progress } = ScenarioEngine.getScenarioInstance(instanceName)
-    var { variables, data, state } = context || {}
+    var { domain, scenarioName, context: instanceContext, progress } = ScenarioEngine.getScenarioInstance(instanceName)
+    var { variables, data, state } = instanceContext || {}
 
     return {
       domain,
@@ -12,7 +11,7 @@ export const scenarioInstanceResolver = {
       scenarioName,
       variables: { ...variables },
       data: { ...data },
-      state: ScenarioStatus[state],
+      state: ScenarioInstanceStatus[state],
       progress,
       timestamp: String(Date.now())
     }
