@@ -6,9 +6,9 @@ export * from './engine'
 import './middlewares'
 import './routes'
 
-import gql from 'graphql-tag'
 import { ScenarioEngine } from './engine'
+import { createLocalClient } from './graphql-local-client'
 
-process.on('bootstrap-module-start' as any, async ({ app, config, client }: any) => {
-  ScenarioEngine.client = client
+process.on('bootstrap-module-start' as any, async ({ app, config, schema }: any) => {
+  ScenarioEngine.client = createLocalClient(schema)
 })
