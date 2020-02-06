@@ -36,6 +36,14 @@ export const Mutation = `
   stopScenario (
     instanceName: String!
   ): ScenarioInstance
+
+  pauseScenario (
+    instanceName: String!
+  ): ScenarioInstance
+
+  resumeScenario (
+    instanceName: String!
+  ): ScenarioInstance
 `
 
 export const Query = `

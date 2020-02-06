@@ -143,6 +143,7 @@ export class ScenarioEngine {
           }
         } else if (this.nextStep == this.steps.length - 1) {
           this.setState(SCENARIO_STATE.STOPPED)
+          if (!this.cronjob) await ScenarioEngine.unload(this.instanceName)
         } else {
           this.nextStep = this.nextStep + 1
         }
@@ -250,7 +251,14 @@ export class ScenarioEngine {
   }
 
   pause() {
-    this.setState(SCENARIO_STATE.PAUSED)
+    if (this.getState() == SCENARIO_STATE.STARTED) this.setState(SCENARIO_STATE.PAUSED)
+  }
+
+  resume() {
+    if (this.getState() == SCENARIO_STATE.PAUSED) {
+      this.setState(SCENARIO_STATE.READY)
+      this.run()
+    }
   }
 
   stop() {
