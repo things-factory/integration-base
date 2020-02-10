@@ -63,7 +63,12 @@ export class Connections {
             Connections.logger.info(`All connector for '${type}' ready`)
           })
       })
-    )
+    ).then(() => {
+      Connections.logger.info(
+        'Connections initialization done: %s',
+        JSON.stringify(Object.keys(Connections.getConnections()))
+      )
+    })
   }
 
   static registerConnector(type, connector) {
