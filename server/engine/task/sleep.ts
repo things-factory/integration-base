@@ -1,4 +1,4 @@
-import { sleep } from '@things-factory/utils'
+import { sleep } from '../utils'
 import { TaskRegistry } from '../task-registry'
 
 async function Sleep(step, { logger }) {
