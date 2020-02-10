@@ -1,7 +1,7 @@
 import net from 'net'
 import PromiseSocket from 'promise-socket'
 
-import { config, logger } from '@things-factory/env'
+import { config } from '@things-factory/env'
 import { Connector } from '../types'
 import { Connections } from '../connections'
 
@@ -17,7 +17,7 @@ export class EchoBack implements Connector {
       })
 
       server.listen(ECHO_SERVER.port, async () => {
-        logger.info('Echo-back server listening on %j', server.address())
+        Connections.logger.info('Echo-back server listening on %j', server.address())
 
         await Promise.all(connectionConfigs.map(this.connect))
 

@@ -1,4 +1,3 @@
-import { logger } from '@things-factory/env'
 import { Connector } from '../types'
 import { Connections } from '../connections'
 
@@ -8,7 +7,7 @@ export class PostgresqlConnector implements Connector {
   async ready(connectionConfigs) {
     await Promise.all(connectionConfigs.map(this.connect))
 
-    logger.info('postgresql-connector connections are ready')
+    Connections.logger.info('postgresql-connector connections are ready')
   }
 
   async connect(connection) {
@@ -35,16 +34,16 @@ export class PostgresqlConnector implements Connector {
       close: client.end.bind(client)
     })
 
-    logger.info(`PostgresSQL Database(${connection.name}:${database}) at ${endpoint} connected.`)
+    Connections.logger.info(`PostgresSQL Database(${connection.name}:${database}) at ${endpoint} connected.`)
   }
 
   async disconnect(name) {
     var client = Connections.getConnection(name)
     try {
       await client.close()
-      logger.info(`PostgresSQL Database(${name}) closed.`)
+      Connections.logger.info(`PostgresSQL Database(${name}) closed.`)
     } catch (e) {
-      logger.error(e)
+      Connections.logger.error(e)
     }
 
     Connections.removeConnection(name)

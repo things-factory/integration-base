@@ -1,4 +1,3 @@
-import { logger } from '@things-factory/env'
 import { Connector } from '../types'
 import { Connections } from '../connections'
 import { promisify } from 'util'
@@ -9,7 +8,7 @@ export class SqliteConnector implements Connector {
   async ready(connectionConfigs) {
     await Promise.all(connectionConfigs.map(this.connect))
 
-    logger.info('sqlite-connector connections are ready')
+    Connections.logger.info('sqlite-connector connections are ready')
   }
 
   async connect(connection) {
@@ -17,7 +16,7 @@ export class SqliteConnector implements Connector {
 
     var database = new sqlite3.Database(endpoint, sqlite3.OPEN_READWRITE, err => {
       if (err) {
-        logger.error(err.message)
+        Connections.logger.error(err.message)
       }
 
       Connections.addConnection(connection.name, {
@@ -25,7 +24,7 @@ export class SqliteConnector implements Connector {
         close: promisify(database.close.bind(database))
       })
 
-      logger.info(`SQLite Database(${connection.name}) at ${endpoint} connected.`)
+      Connections.logger.info(`SQLite Database(${connection.name}) at ${endpoint} connected.`)
     })
   }
 
@@ -33,9 +32,9 @@ export class SqliteConnector implements Connector {
     var database = Connections.getConnection(name)
     try {
       await database.close()
-      logger.info(`SQLite Database(${name}) closed.`)
+      Connections.logger.info(`SQLite Database(${name}) closed.`)
     } catch (e) {
-      logger.error(e)
+      Connections.logger.error(e)
     }
 
     Connections.removeConnection(name)

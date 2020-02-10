@@ -1,4 +1,3 @@
-import { logger } from '@things-factory/env'
 import { Connector } from '../types'
 import { Connections } from '../connections'
 
@@ -33,7 +32,7 @@ export class GraphqlConnector implements Connector {
   async ready(connectionConfigs) {
     await Promise.all(connectionConfigs.map(this.connect))
 
-    logger.info('graphql-connector connections are ready')
+    Connections.logger.info('graphql-connector connections are ready')
   }
 
   async connect(connection) {
@@ -53,11 +52,11 @@ export class GraphqlConnector implements Connector {
     var ERROR_HANDLER: any = ({ graphQLErrors, networkError }) => {
       if (graphQLErrors)
         graphQLErrors.map(({ message, locations, path }) => {
-          logger.error(`[GraphQL error] Message: ${message}, Location: ${locations}, Path: ${path}`)
+          Connections.logger.error(`[GraphQL error] Message: ${message}, Location: ${locations}, Path: ${path}`)
         })
 
       if (networkError) {
-        logger.error(`[Network error - ${networkError.statusCode}] ${networkError}`)
+        Connections.logger.error(`[Network error - ${networkError.statusCode}] ${networkError}`)
       }
     }
 
