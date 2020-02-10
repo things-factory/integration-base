@@ -128,8 +128,12 @@ export class ScenarioEngine {
         }
 
         var step = this.steps[this.nextStep]
-        var { next, state, data } = await this.process(step, context)
-
+        try {
+          var { next, state, data } = await this.process(step, context)
+        } catch(ex) {
+          if (!this.cronjob) await ScenarioEngine.unload(this.instanceName)
+        }
+        
         context.data[step.name] = data
 
         this.publishState()
