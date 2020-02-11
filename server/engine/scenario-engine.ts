@@ -128,7 +128,7 @@ export class ScenarioEngine {
         }
 
         var step = this.steps[this.nextStep]
-        var { next, state, data } = await this.process(step, context)
+        var { next, state, data } = (await this.process(step, context)) || {}
 
         context.data[step.name] = data
 
