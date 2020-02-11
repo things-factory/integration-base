@@ -1,4 +1,5 @@
-import './echo-back'
+import './echo-back-server'
+import './echo-back-connector'
 import './http-connector'
 import './graphql-connector'
 import './sqlite-connector'

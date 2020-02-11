@@ -1,29 +1,14 @@
 import net from 'net'
 import PromiseSocket from 'promise-socket'
 
-import { config } from '@things-factory/env'
 import { Connector } from '../types'
 import { Connections } from '../connections'
 
 export class EchoBack implements Connector {
-  ready(connectionConfigs) {
-    const ECHO_SERVER = config.get('echoServer')
+  async ready(connectionConfigs) {
+    await Promise.all(connectionConfigs.map(this.connect))
 
-    return new Promise((resolve, reject) => {
-      var server = net.createServer(socket => {
-        socket.on('data', function(data) {
-          socket.write(data.toString())
-        })
-      })
-
-      server.listen(ECHO_SERVER.port, async () => {
-        Connections.logger.info('Echo-back server listening on %j', server.address())
-
-        await Promise.all(connectionConfigs.map(this.connect))
-
-        resolve()
-      })
-    })
+    Connections.logger.info('echo-back connections are ready')
   }
 
   async connect(connection) {
