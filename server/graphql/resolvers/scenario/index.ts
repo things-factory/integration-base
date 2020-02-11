@@ -6,6 +6,7 @@ import { updateMultipleScenario } from './update-multiple-scenario'
 import { createScenario } from './create-scenario'
 import { deleteScenario } from './delete-scenario'
 import { deleteScenarios } from './delete-scenarios'
+import { copyScenarios } from './copy-scenarios'
 
 import { startScenario } from './start-scenario'
 import { stopScenario } from './stop-scenario'
@@ -30,6 +31,7 @@ export const Mutation = {
   ...createScenario,
   ...deleteScenario,
   ...deleteScenarios,
+  ...copyScenarios,
   ...startScenario,
   ...stopScenario,
   ...pauseScenario,

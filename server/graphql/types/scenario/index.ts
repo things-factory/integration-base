@@ -27,6 +27,10 @@ export const Mutation = `
     ids: [String]!
   ): Boolean
 
+  copyScenarios (
+    ids: [String]!
+  ): [Scenario]
+
   startScenario (
     instanceName: String
     scenarioName: String!
