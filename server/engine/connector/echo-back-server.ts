@@ -56,7 +56,7 @@ export class EchoBack implements Connector {
     var server = socket['__server__']
 
     await socket.destroy()
-    server && (await server.destroy())
+    server && (await server.close())
 
     Connections.logger.info(`echo-back-server connection(${name}) is disconnected`)
   }
