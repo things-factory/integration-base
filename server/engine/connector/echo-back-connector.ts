@@ -17,12 +17,16 @@ export class EchoBack implements Connector {
 
     await socket.connect(port, host)
     Connections.addConnection(connection.name, socket)
+
+    Connections.logger.info(`echo-back-connector connection(${connection.name}:${connection.endpoint}) is connected`)
   }
 
   async disconnect(name) {
     let socket = Connections.removeConnection(name)
 
     await socket.destroy()
+
+    Connections.logger.info(`echo-back-connector connection(${name}) is disconnected`)
   }
 
   get parameterSpec() {

@@ -68,12 +68,16 @@ export class GraphqlConnector implements Connector {
         link: ApolloLink.from([onError(ERROR_HANDLER), httpLink])
       })
     )
+
+    Connections.logger.info(`graphql-connector connection(${connection.name}:${connection.endpoint}) is connected`)
   }
 
   async disconnect(name) {
     var client = Connections.getConnection(name)
     client.stop()
     Connections.removeConnection(name)
+
+    Connections.logger.info(`graphql-connector connection(${name}) is disconnected`)
   }
 
   get parameterSpec() {

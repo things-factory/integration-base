@@ -15,10 +15,14 @@ export class HttpConnector implements Connector {
       ...connection,
       params
     })
+
+    Connections.logger.info(`http-connector connection(${connection.name}:${connection.endpoint}) is connected`)
   }
 
   async disconnect(name) {
     Connections.removeConnection(name)
+
+    Connections.logger.info(`http-connector connection(${name}) is disconnected`)
   }
 
   get parameterSpec() {

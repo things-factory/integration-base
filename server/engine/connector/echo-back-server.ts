@@ -40,6 +40,8 @@ export class EchoBack implements Connector {
 
           Connections.addConnection(config.name, promiseSocket)
 
+          Connections.logger.info(`echo-back-server connection(${config.name}:${config.endpoint}) is connected`)
+
           resolve()
         } catch (err) {
           Connections.logger.error(err)
@@ -55,6 +57,8 @@ export class EchoBack implements Connector {
 
     await socket.destroy()
     server && (await server.destroy())
+
+    Connections.logger.info(`echo-back-server connection(${name}) is disconnected`)
   }
 
   get parameterSpec() {
