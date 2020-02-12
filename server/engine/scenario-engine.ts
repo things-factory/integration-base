@@ -232,12 +232,11 @@ export class ScenarioEngine {
     this.context.logger.info(message)
     this.context.state = state
 
-    if (state == SCENARIO_STATE.STOPPED) {
+    if (state == SCENARIO_STATE.STOPPED || state == SCENARIO_STATE.HALTED) {
       this.nextStep = 0
-    }
-
-    if ((state == SCENARIO_STATE.STOPPED || state == SCENARIO_STATE.HALTED) && !this.cronjob) {
-      ScenarioEngine.unload(this.instanceName)
+      if (!this.cronjob) {
+        ScenarioEngine.unload(this.instanceName)
+      }
     }
 
     this.publishState(message)
