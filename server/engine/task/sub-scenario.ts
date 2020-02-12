@@ -19,7 +19,7 @@ async function SubScenario(step, { logger, load, data }) {
   await load(name, subscenario)
   logger.info(`Sub Scenario '${subscenario.name}' done.`)
 
-  return scenario
+  return {}
 }
 
 SubScenario.parameterSpec = [

@@ -9,6 +9,7 @@ import { Step, Context, SCENARIO_STATE } from './types'
 import { getRepository } from 'typeorm'
 import { Scenario } from '../entities'
 import { CronJob } from 'cron'
+import orderBy from 'lodash/orderBy'
 
 const { combine, timestamp, splat, printf } = format
 
@@ -81,7 +82,7 @@ export class ScenarioEngine {
     this.scenarioName = scenarioName
     this.schedule = schedule
     this.timezone = timezone
-    this.steps = steps || []
+    this.steps = orderBy(steps || [], step => step.sequence)
     this.domain = domain
 
     this.context = {
