@@ -7,7 +7,7 @@ export const taskTypeResolver = {
     return {
       name,
       description: '',
-      parameterSpec: taskType.parameterSpec
+      parameterSpec: taskType?.parameterSpec
     }
   }
 }
