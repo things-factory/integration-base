@@ -82,7 +82,7 @@ export class ScenarioEngine {
     this.scenarioName = scenarioName
     this.schedule = schedule
     this.timezone = timezone
-    this.steps = orderBy(steps || [], step => step.sequence)
+    this.steps = orderBy(steps || [], step => step.sequence).filter(step => !step.skip)
     this.domain = domain
 
     this.context = {
@@ -129,7 +129,8 @@ export class ScenarioEngine {
         }
 
         var step = this.steps[this.nextStep]
-        var { next, state, data } = (await this.process(step, context)) || {}
+        // @ts-ignore: Initializer provides no value for this binding element and the binding element has no default value.
+        var { next, state, data } = step.skip ? {} : (await this.process(step, context)) || {}
 
         context.data[step.name] = data
 

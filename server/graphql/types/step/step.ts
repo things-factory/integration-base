@@ -9,7 +9,7 @@ export const Step = gql`
     scenario: Scenario
     sequence: Int
     task: String
-    ifSkip: Boolean
+    skip: Boolean
     connection: String
     params: String
     updater: User
