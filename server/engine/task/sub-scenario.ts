@@ -4,9 +4,14 @@ import { getRepository } from 'typeorm'
 
 async function SubScenario(step, { logger, load, data }) {
   var {
+    ifSkip,
     name,
     params: { scenario }
   } = step
+
+  if (ifSkip) {
+    return {}
+  }
 
   var subscenario = await getRepository(Scenario).findOne({
     where: {

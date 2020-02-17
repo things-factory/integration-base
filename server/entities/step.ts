@@ -47,6 +47,11 @@ export class Step {
   @Column({
     nullable: true
   })
+  ifSkip: boolean
+
+  @Column({
+    nullable: true
+  })
   connection: string
 
   @Column({
