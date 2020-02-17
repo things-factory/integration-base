@@ -1,7 +1,7 @@
 import { createLogger, format, transports } from 'winston'
 import 'winston-daily-rotate-file'
 import { Domain, pubsub } from '@things-factory/shell'
-import { sleep } from './utils'
+import { sleep } from '@things-factory/utils'
 
 import { TaskRegistry } from './task-registry'
 import { Step, Context, SCENARIO_STATE } from './types'
