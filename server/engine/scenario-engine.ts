@@ -82,7 +82,7 @@ export class ScenarioEngine {
     this.scenarioName = scenarioName
     this.schedule = schedule
     this.timezone = timezone
-    this.steps = orderBy(steps || [], step => step.sequence).filter(step => !step.skip)
+    this.steps = orderBy(steps || [], step => step.sequence)
     this.domain = domain
 
     this.context = {
