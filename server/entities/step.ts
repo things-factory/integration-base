@@ -47,7 +47,7 @@ export class Step {
   @Column({
     nullable: true
   })
-  active: boolean
+  skip: boolean
 
   @Column({
     nullable: true
