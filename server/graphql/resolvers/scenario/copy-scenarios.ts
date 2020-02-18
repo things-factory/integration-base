@@ -23,7 +23,7 @@ export const copyScenarios = {
           return {
             scenario: scenarioId,
             name: step.name,
-            description: step.name,
+            description: step.description,
             sequence: step.sequence,
             task: step.task,
             connection: step.connection,
