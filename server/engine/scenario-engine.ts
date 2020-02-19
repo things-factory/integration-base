@@ -129,10 +129,15 @@ export class ScenarioEngine {
         }
 
         var step = this.steps[this.nextStep]
+        
         // @ts-ignore: Initializer provides no value for this binding element and the binding element has no default value.
-        var { next, state, data } = step.skip ? {} : (await this.process(step, context)) || {}
+        var { next, state, data } = {}
 
-        context.data[step.name] = data
+        if (!step.skip) {
+          // @ts-ignore: Initializer provides no value for this binding element and the binding element has no default value.
+          var { next, state, data } = (await this.process(step, context)) || {};
+          context.data[step.name] = data
+        }
 
         this.publishState()
 
