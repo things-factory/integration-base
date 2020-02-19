@@ -2,7 +2,8 @@ import { TaskRegistry } from '../task-registry'
 import { Scenario } from '../../entities'
 import { getRepository } from 'typeorm'
 
-async function SubScenario(step, { logger, load, data }) {
+async function SubScenario(step, context) {
+  var { logger, load } = context
   var {
     name,
     params: { scenario }
@@ -16,7 +17,7 @@ async function SubScenario(step, { logger, load, data }) {
   })
 
   logger.info(`Sub Scenario '${subscenario.name}' Started.`)
-  await load(name, subscenario)
+  await load(name, subscenario, context)
   logger.info(`Sub Scenario '${subscenario.name}' done.`)
 
   return {}
