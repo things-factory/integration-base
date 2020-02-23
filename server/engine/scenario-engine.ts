@@ -134,8 +134,15 @@ export class ScenarioEngine {
         var { next, state, data } = {}
 
         if (!step.skip) {
-          // @ts-ignore: Initializer provides no value for this binding element and the binding element has no default value.
-          var { next, state, data } = (await this.process(step, context)) || {};
+          try {
+            // @ts-ignore: Initializer provides no value for this binding element and the binding element has no default value.
+            var { next, state, data } = await this.process(step, context)
+          } catch(ex) {
+            // if (!this.cronjob) {
+            await ScenarioEngine.unload(this.instanceName)
+            // }
+          }
+
           context.data[step.name] = data
         }
 
@@ -176,6 +183,11 @@ export class ScenarioEngine {
     })
 
     await subScenarioInstance.run()
+    
+    var step = this.steps[stepName];
+    if (subScenarioInstance.getState() == SCENARIO_STATE.HALTED && step.errorBreakMain) {
+      throw new Error(`Sub scenario[${stepName}] error~`)
+    }
   }
 
   publishData(tag, data) {

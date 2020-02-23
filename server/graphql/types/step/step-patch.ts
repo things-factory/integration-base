@@ -8,6 +8,7 @@ export const StepPatch = gql`
     sequence: Int
     task: String
     skip: Boolean
+    errorBreakMain: Boolean
     connection: String
     params: String
     cuFlag: String
