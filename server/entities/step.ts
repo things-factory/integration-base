@@ -52,7 +52,7 @@ export class Step {
   @Column({
     nullable: true
   })
-  errorBreakMain: Boolean
+  errorBreakMain: boolean
 
   @Column({
     nullable: true
