@@ -163,8 +163,12 @@ export class ScenarioEngine {
     }
   }
 
-  async loadSubscenario(stepName, scenarioConfig) {
-    var { errorPropagation = false } = scenarioConfig
+  async loadSubscenario(step, scenarioConfig) {
+    var {
+      name: stepName,
+      params: { errorPropagation }
+    } = step
+
     this.context.data[stepName] = {}
 
     var subScenarioInstance = new ScenarioEngine(`${this.instanceName}$${stepName}`, scenarioConfig, {
