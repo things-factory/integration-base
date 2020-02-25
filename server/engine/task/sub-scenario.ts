@@ -35,7 +35,7 @@ SubScenario.parameterSpec = [
   {
     type: 'checkbox',
     name: 'errorPropagation',
-    lable: 'error-propagation'
+    label: 'error-propagation'
   }
 ]
 
