@@ -129,10 +129,10 @@ export class ScenarioEngine {
         }
 
         var step = this.steps[this.nextStep]
-        
+
         if (!step.skip) {
           // @ts-ignore: Initializer provides no value for this binding element and the binding element has no default value.
-          var { next, state, data } = (await this.process(step, context)) || {};
+          var { next, state, data } = (await this.process(step, context)) || {}
           context.data[step.name] = data
         }
 
@@ -164,6 +164,7 @@ export class ScenarioEngine {
   }
 
   async loadSubscenario(stepName, scenarioConfig) {
+    var { errorPropagation = false } = scenarioConfig
     this.context.data[stepName] = {}
 
     var subScenarioInstance = new ScenarioEngine(`${this.instanceName}$${stepName}`, scenarioConfig, {
@@ -173,17 +174,9 @@ export class ScenarioEngine {
     })
 
     await subScenarioInstance.run()
-    
-    for (var i = 0; i++; this.steps) {
-      let step = this.steps[i]
-      if (stepName == step.name) {
-        break;
-      }
-    }
 
-    var step = this.steps[i];
-    if (subScenarioInstance.getState() == SCENARIO_STATE.HALTED && step.errorBreakMain) {
-      throw new Error(`Sub scenario[${stepName}] error~`)
+    if (errorPropagation && subScenarioInstance.getState() == SCENARIO_STATE.HALTED) {
+      throw new Error(`Sub-scenario[${this.instanceName}$${stepName}] is halted.`)
     }
   }
 

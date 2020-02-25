@@ -52,11 +52,6 @@ export class Step {
   @Column({
     nullable: true
   })
-  errorBreakMain: boolean
-
-  @Column({
-    nullable: true
-  })
   connection: string
 
   @Column({

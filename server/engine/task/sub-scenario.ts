@@ -31,6 +31,11 @@ SubScenario.parameterSpec = [
     property: {
       queryName: 'scenarios'
     }
+  },
+  {
+    type: 'checkbox',
+    name: 'errorPropagation',
+    lable: 'error-propagation'
   }
 ]
 
