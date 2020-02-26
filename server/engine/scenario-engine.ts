@@ -100,7 +100,7 @@ export class ScenarioEngine {
               filename: `logs/scenario-${instanceName}-%DATE%.log`,
               datePattern: 'YYYY-MM-DD-HH',
               zippedArchive: false,
-              maxSize: '20m',
+              maxSize: '5m',
               maxFiles: '14d',
               level: 'info'
             })
@@ -133,6 +133,9 @@ export class ScenarioEngine {
         }
 
         var step = this.steps[this.nextStep]
+
+        // @ts-ignore: Initializer provides no value for this binding element and the binding element has no default value.
+        var { next, state, data } = {};
 
         if (!step.skip) {
           // @ts-ignore: Initializer provides no value for this binding element and the binding element has no default value.
