@@ -77,7 +77,11 @@ export class ScenarioEngine {
     SCENARIOS.forEach(scenario => ScenarioEngine.load(scenario.name, scenario))
   }
 
-  constructor(instanceName, { name: scenarioName, steps, schedule = '', timezone = 'Asia/Seoul', domain }, context?) {
+  constructor(
+    instanceName,
+    { name: scenarioName, steps, schedule = '', timezone = 'Asia/Seoul', domain },
+    context?
+  ) {
     this.instanceName = instanceName
     this.scenarioName = scenarioName
     this.schedule = schedule
@@ -102,13 +106,13 @@ export class ScenarioEngine {
             })
           ]
         }),
-      publish: context.publish || this.publishData.bind(this),
-      load: context.load || this.loadSubscenario.bind(this),
-      data: context.data || {},
-      variables: context.variables || {},
+      publish: context?.publish || this.publishData.bind(this),
+      load: context?.load || this.loadSubscenario.bind(this),
+      data: context?.data || {},
+      variables: context?.variables || {},
       client: ScenarioEngine.client,
       state: SCENARIO_STATE.READY,
-      root: context.root || this
+      root: context?.root || this
     }
   }
 
@@ -129,10 +133,10 @@ export class ScenarioEngine {
         }
 
         var step = this.steps[this.nextStep]
-        
+
         if (!step.skip) {
           // @ts-ignore: Initializer provides no value for this binding element and the binding element has no default value.
-          var { next, state, data } = (await this.process(step, context)) || {};
+          var { next, state, data } = (await this.process(step, context)) || {}
           context.data[step.name] = data
         }
 
@@ -173,15 +177,15 @@ export class ScenarioEngine {
     })
 
     await subScenarioInstance.run()
-    
+
     for (var i = 0; i++; this.steps) {
       let step = this.steps[i]
       if (stepName == step.name) {
-        break;
+        break
       }
     }
 
-    var step = this.steps[i];
+    var step = this.steps[i]
     if (subScenarioInstance.getState() == SCENARIO_STATE.HALTED && step.errorBreakMain) {
       throw new Error(`Sub scenario[${stepName}] error~`)
     }
