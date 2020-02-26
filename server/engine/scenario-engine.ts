@@ -88,7 +88,7 @@ export class ScenarioEngine {
     this.context = {
       domain,
       logger:
-        context.logger ||
+        context?.logger ||
         createLogger({
           format: combine(timestamp(), splat(), ScenarioEngine.logFormat),
           transports: [
