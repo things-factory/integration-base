@@ -77,11 +77,7 @@ export class ScenarioEngine {
     SCENARIOS.forEach(scenario => ScenarioEngine.load(scenario.name, scenario))
   }
 
-  constructor(
-    instanceName,
-    { name: scenarioName, steps, schedule = '', timezone = 'Asia/Seoul', domain },
-    context?
-  ) {
+  constructor(instanceName, { name: scenarioName, steps, schedule = '', timezone = 'Asia/Seoul', domain }, context?) {
     this.instanceName = instanceName
     this.scenarioName = scenarioName
     this.schedule = schedule
@@ -135,7 +131,7 @@ export class ScenarioEngine {
         var step = this.steps[this.nextStep]
 
         // @ts-ignore: Initializer provides no value for this binding element and the binding element has no default value.
-        var { next, state, data } = {};
+        var { next, state, data } = {}
 
         if (!step.skip) {
           // @ts-ignore: Initializer provides no value for this binding element and the binding element has no default value.
