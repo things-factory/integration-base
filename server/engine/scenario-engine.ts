@@ -176,7 +176,7 @@ export class ScenarioEngine {
 
     var subScenarioInstance = new ScenarioEngine(`${this.instanceName}$${stepName}`, scenarioConfig, {
       ...this.context,
-      data: this.context.data,
+      data: this.context.data[stepName],
       state: SCENARIO_STATE.READY
     })
 
