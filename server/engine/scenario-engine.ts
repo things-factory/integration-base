@@ -88,7 +88,7 @@ export class ScenarioEngine {
     this.context = {
       domain,
       logger:
-        context.logger ||
+        context?.logger ||
         createLogger({
           format: combine(timestamp(), splat(), ScenarioEngine.logFormat),
           transports: [
@@ -96,19 +96,19 @@ export class ScenarioEngine {
               filename: `logs/scenario-${instanceName}-%DATE%.log`,
               datePattern: 'YYYY-MM-DD-HH',
               zippedArchive: false,
-              maxSize: '20m',
+              maxSize: '5m',
               maxFiles: '14d',
               level: 'info'
             })
           ]
         }),
-      publish: context.publish || this.publishData.bind(this),
-      load: context.load || this.loadSubscenario.bind(this),
-      data: context.data || {},
-      variables: context.variables || {},
+      publish: context?.publish || this.publishData.bind(this),
+      load: context?.load || this.loadSubscenario.bind(this),
+      data: context?.data || {},
+      variables: context?.variables || {},
       client: ScenarioEngine.client,
       state: SCENARIO_STATE.READY,
-      root: context.root || this
+      root: context?.root || this
     }
   }
 
@@ -129,6 +129,9 @@ export class ScenarioEngine {
         }
 
         var step = this.steps[this.nextStep]
+
+        // @ts-ignore: Initializer provides no value for this binding element and the binding element has no default value.
+        var { next, state, data } = {}
 
         if (!step.skip) {
           // @ts-ignore: Initializer provides no value for this binding element and the binding element has no default value.
