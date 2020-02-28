@@ -5,7 +5,6 @@ import { getRepository } from 'typeorm'
 async function SubScenario(step, context) {
   var { logger, load } = context
   var {
-    name,
     params: { scenario }
   } = step
 
@@ -17,7 +16,7 @@ async function SubScenario(step, context) {
   })
 
   logger.info(`Sub Scenario '${subscenario.name}' Started.`)
-  await load(name, subscenario, context)
+  await load(step, subscenario, context)
   logger.info(`Sub Scenario '${subscenario.name}' done.`)
 
   return {}
@@ -31,6 +30,11 @@ SubScenario.parameterSpec = [
     property: {
       queryName: 'scenarios'
     }
+  },
+  {
+    type: 'checkbox',
+    name: 'errorPropagation',
+    label: 'error-propagation'
   }
 ]
 

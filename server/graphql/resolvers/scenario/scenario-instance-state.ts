@@ -6,7 +6,7 @@ export const scenarioInstanceState = {
   scenarioInstanceState: {
     /* subscription payload can be filtered here */
     // resolve(payload, args) {
-    //   return payload.systemRebooted
+    //   return payload.publishData
     // },
     // subscribe(_, args, { ctx }) {
     /* it is possible to check authentication here */

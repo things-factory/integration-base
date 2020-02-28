@@ -166,7 +166,12 @@ export class ScenarioEngine {
     }
   }
 
-  async loadSubscenario(stepName, scenarioConfig) {
+  async loadSubscenario(step, scenarioConfig) {
+    var {
+      name: stepName,
+      params: { errorPropagation }
+    } = step
+
     this.context.data[stepName] = {}
 
     var subScenarioInstance = new ScenarioEngine(`${this.instanceName}$${stepName}`, scenarioConfig, {
@@ -177,16 +182,8 @@ export class ScenarioEngine {
 
     await subScenarioInstance.run()
 
-    for (var i = 0; i++; this.steps) {
-      let step = this.steps[i]
-      if (stepName == step.name) {
-        break
-      }
-    }
-
-    var step = this.steps[i]
-    if (subScenarioInstance.getState() == SCENARIO_STATE.HALTED && step.errorBreakMain) {
-      throw new Error(`Sub scenario[${stepName}] error~`)
+    if (errorPropagation && subScenarioInstance.getState() == SCENARIO_STATE.HALTED) {
+      throw new Error(`Sub-scenario[${this.instanceName}$${stepName}] is halted.`)
     }
   }
 
