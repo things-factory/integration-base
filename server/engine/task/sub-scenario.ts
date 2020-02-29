@@ -20,7 +20,7 @@ async function SubScenario(step, context) {
   logger.info(`Sub Scenario '${subscenario.name}' done.`)
 
   return {
-    data: context.data
+    data: context.data[step.name]
   }
 }
 
