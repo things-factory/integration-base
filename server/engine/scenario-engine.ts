@@ -85,7 +85,7 @@ export class ScenarioEngine {
     this.steps = orderBy(steps || [], step => step.sequence)
     this.domain = domain
 
-    this.context = {
+    this.context = context || {
       domain,
       logger:
         context?.logger ||
