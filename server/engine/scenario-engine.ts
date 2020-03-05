@@ -176,7 +176,6 @@ export class ScenarioEngine {
 
     let subContext = {
       ...context,
-      variables: context.variables,
       data: context.data[stepName],
       state: SCENARIO_STATE.READY
     }
