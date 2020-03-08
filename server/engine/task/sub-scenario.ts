@@ -12,7 +12,7 @@ async function SubScenario(step, context) {
     where: {
       id: scenario
     },
-    relations: ['steps']
+    relations: ['steps', 'domain']
   })
 
   logger.info(`Sub Scenario '${subscenario.name}' Started.`)

@@ -180,6 +180,10 @@ export class ScenarioEngine {
       state: SCENARIO_STATE.READY
     }
 
+    if (!scenarioConfig.domain) {
+      scenarioConfig.domain = context.domain
+    }
+
     var subScenarioInstance = new ScenarioEngine(`${this.instanceName}$${stepName}`, scenarioConfig, subContext)
 
     await subScenarioInstance.run()
