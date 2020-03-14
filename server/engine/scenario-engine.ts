@@ -18,6 +18,7 @@ export const ScenarioInstanceStatus = ['READY', 'STARTED', 'PAUSED', 'STOPPED', 
 export class ScenarioEngine {
   public static client: Object
   private static scenarioInstances = {}
+  private subScenarioInstances = []
 
   public domain: Domain
   public scenarioName: string
@@ -44,6 +45,15 @@ export class ScenarioEngine {
     return Object.values(ScenarioEngine.scenarioInstances)
   }
 
+  public addSubScenarioInstance(instance: ScenarioEngine): ScenarioEngine[] {
+    this.subScenarioInstances.push(instance)
+    return this.subScenarioInstances
+  }
+
+  public getSubScenarioInstances(): ScenarioEngine[] {
+    return this.subScenarioInstances
+  }
+
   public static async load(instanceName, scenarioConfig, context?) {
     var scenarioInstance = ScenarioEngine.scenarioInstances[instanceName]
     if (scenarioInstance) {
@@ -63,9 +73,24 @@ export class ScenarioEngine {
     if (!instance) {
       return
     }
+
+    await ScenarioEngine.stopSubScenarios(instance, 'M');
     instance.stop()
 
     delete ScenarioEngine.scenarioInstances[instanceName]
+  }
+
+  public static async stopSubScenarios(instance, type='S') {
+    if (type == 'S') {
+      instance.setState(SCENARIO_STATE.STOPPED)
+    }
+
+    var subScenarioInstances = instance.getSubScenarioInstances()
+
+    var subInstance = subScenarioInstances.pop()
+    if (subInstance) {
+      await this.stopSubScenarios(subInstance)
+    }
   }
 
   public static async loadAll() {
@@ -185,7 +210,7 @@ export class ScenarioEngine {
     }
 
     var subScenarioInstance = new ScenarioEngine(`${this.instanceName}$${stepName}`, scenarioConfig, subContext)
-
+    this.addSubScenarioInstance(subScenarioInstance)
     await subScenarioInstance.run()
 
     if (errorPropagation && subScenarioInstance.getState() == SCENARIO_STATE.HALTED) {
@@ -247,7 +272,7 @@ export class ScenarioEngine {
       return
     }
 
-    var message = `[state changed] ${ScenarioInstanceStatus[this.getState()]} => ${ScenarioInstanceStatus[state]}${
+    var message = `${this.instanceName}:[state changed] ${ScenarioInstanceStatus[this.getState()]} => ${ScenarioInstanceStatus[state]}${
       this.message ? ' caused by ' + this.message : ''
     }`
 
