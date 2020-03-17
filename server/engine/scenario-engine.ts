@@ -88,8 +88,9 @@ export class ScenarioEngine {
     var subScenarioInstances = instance.getSubScenarioInstances()
 
     var subInstance = subScenarioInstances.pop()
-    if (subInstance) {
+    while (subInstance) {
       await this.stopSubScenarios(subInstance)
+      subInstance = subScenarioInstances.pop()
     }
   }
 
