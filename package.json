@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "@things-factory/auth-base": "^2.0.0",
+    "async-mqtt": "^2.5.0",
     "cron": "^1.7.2",
     "cross-fetch": "^3.0.4",
     "moment-timezone": "^0.5.27",
