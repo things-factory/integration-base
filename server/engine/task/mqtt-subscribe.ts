@@ -4,17 +4,17 @@ import { Connections } from '../connections'
 async function MqttSubscribe(step, { logger }) {
   const {
     connection: connectionName,
-    params: { topic }
+    params: { topic },
   } = step
 
   const client = Connections.getConnection(connectionName)
 
   await client.subscribe(topic)
 
-  logger.info(`mqtt-subscribe :\n'${message.toString()}'`)
+  // logger.info(`mqtt-subscribe :\n'${message.toString()}'`)
 
   return {
-    data: message
+    // data: message
   }
 }
 
@@ -22,8 +22,8 @@ MqttSubscribe.parameterSpec = [
   {
     type: 'string',
     name: 'topic',
-    label: 'topic'
-  }
+    label: 'topic',
+  },
 ]
 
 TaskRegistry.registerTaskHandler('mqtt-subscribe', MqttSubscribe)
