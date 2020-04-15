@@ -1,6 +1,6 @@
 {
   "name": "@things-factory/integration-base",
-  "version": "2.0.64",
+  "version": "2.0.66",
   "main": "dist-server/index.js",
   "browser": "client/index.js",
   "things-factory": true,
@@ -35,6 +35,9 @@
     "mqtt": "^3.0.0",
     "node-fetch": "^2.6.0",
     "promise-socket": "^6.0.2"
+  },
+  "resolutions": {
+    "@things-factory/auth-base": "^2.0.2"
   },
   "devDependencies": {
     "@things-factory/board-app": "^2.0.0"
