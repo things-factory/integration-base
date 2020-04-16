@@ -38,6 +38,6 @@
     "promise-socket": "^6.0.2"
   },
   "devDependencies": {
-    "@things-factory/board-app": "^2.0.0"
+    "@things-factory/operato-ecs": "^2.0.0"
   }
 }
