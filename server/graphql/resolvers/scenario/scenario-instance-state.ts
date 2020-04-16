@@ -37,8 +37,6 @@ export const scenarioInstanceState = {
     subscribe: withFilter(
       () => pubsub.asyncIterator('scenario-instance-state'),
       (payload, variables, context, info) => {
-        logger.warn(`context: ${JSON.stringify(context, null, 2)}`)
-
         var { instanceName, scenarioName } = variables
 
         if (scenarioName && payload.scenarioInstanceState.scenarioName != scenarioName) {
