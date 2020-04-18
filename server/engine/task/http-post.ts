@@ -45,12 +45,12 @@ HttpPost.parameterSpec = [
     label: 'path'
   },
   {
-    type: 'map',
+    type: 'http-headers',
     name: 'headers',
     label: 'headers'
   },
   {
-    type: 'map',
+    type: 'http-params',
     name: 'params',
     label: 'params'
   }

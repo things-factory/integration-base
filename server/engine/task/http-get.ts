@@ -45,12 +45,12 @@ HttpGet.parameterSpec = [
     label: 'path'
   },
   {
-    type: 'string',
+    type: 'http-headers',
     name: 'headers',
     label: 'headers'
   },
   {
-    type: 'string',
+    type: 'http-params',
     name: 'params',
     label: 'params'
   }
