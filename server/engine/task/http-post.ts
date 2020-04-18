@@ -50,7 +50,7 @@ HttpPost.parameterSpec = [
     label: 'headers'
   },
   {
-    type: 'http-params',
+    type: 'http-parameters',
     name: 'params',
     label: 'params'
   }
