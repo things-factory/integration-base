@@ -6,7 +6,7 @@ import { URL } from 'url'
 
 async function HttpPost(step, { logger }) {
   var { connection: connectionName, params: stepOptions } = step
-  var { headers, params = {}, path } = stepOptions || {}
+  var { headers, params = {}, body, path } = stepOptions || {}
   var connection = Connections.getConnection(connectionName)
 
   if (!connection) {
@@ -53,6 +53,11 @@ HttpPost.parameterSpec = [
     type: 'http-parameters',
     name: 'params',
     label: 'params'
+  },
+  {
+    type: 'http-body',
+    name: 'body',
+    label: 'body'
   }
 ]
 
