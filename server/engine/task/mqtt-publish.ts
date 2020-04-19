@@ -7,7 +7,7 @@ async function MqttPublish(step, { logger }) {
     params: { topic, message }
   } = step
 
-  const client = Connections.getConnection(connectionName)
+  const { client } = Connections.getConnection(connectionName)
   if (!client) {
     throw Error(`connection is not found : ${connectionName}`)
   }

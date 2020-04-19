@@ -74,15 +74,15 @@ export class ScenarioEngine {
       return
     }
 
-    await ScenarioEngine.stopSubScenarios(instance, 'M');
-    instance.stop()
+    await ScenarioEngine.stopSubScenarios(instance, 'M')
+    instance.dispose()
 
     delete ScenarioEngine.scenarioInstances[instanceName]
   }
 
-  public static async stopSubScenarios(instance, type='S') {
+  public static async stopSubScenarios(instance, type = 'S') {
     if (type == 'S') {
-      instance.setState(SCENARIO_STATE.STOPPED)
+      instance.dispose()
     }
 
     var subScenarioInstances = instance.getSubScenarioInstances()
@@ -134,7 +134,8 @@ export class ScenarioEngine {
       variables: context?.variables || {},
       client: ScenarioEngine.client,
       state: SCENARIO_STATE.READY,
-      root: context?.root || this
+      root: context?.root || this,
+      closures: []
     }
   }
 
@@ -203,6 +204,7 @@ export class ScenarioEngine {
     let subContext = {
       ...context,
       data: context.data[stepName],
+      closures: [],
       state: SCENARIO_STATE.READY
     }
 
@@ -273,9 +275,9 @@ export class ScenarioEngine {
       return
     }
 
-    var message = `${this.instanceName}:[state changed] ${ScenarioInstanceStatus[this.getState()]} => ${ScenarioInstanceStatus[state]}${
-      this.message ? ' caused by ' + this.message : ''
-    }`
+    var message = `${this.instanceName}:[state changed] ${ScenarioInstanceStatus[this.getState()]} => ${
+      ScenarioInstanceStatus[state]
+    }${this.message ? ' caused by ' + this.message : ''}`
 
     this.message = ''
 
@@ -324,6 +326,12 @@ export class ScenarioEngine {
 
   dispose() {
     this.stop()
+
+    var closure = this.context?.closures?.pop()
+    while (closure) {
+      closure.call(this)
+      closure = this.context?.closures?.pop()
+    }
   }
 
   async process(step, context): Promise<{ next: string; state: SCENARIO_STATE; data: object }> {

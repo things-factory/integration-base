@@ -1,3 +1,5 @@
+import mqtt from 'async-mqtt'
+
 import { TaskRegistry } from '../task-registry'
 import { Connections } from '../connections'
 import { sleep } from '@things-factory/utils'
@@ -17,12 +19,14 @@ async function MqttSubscribe(step, context) {
     name
   } = step
 
-  const { logger, __mqtt_subscriber } = context
+  const { logger, closures, __mqtt_subscriber } = context
   if (!__mqtt_subscriber) {
     context.__mqtt_subscriber = {}
   }
 
-  const broker = Connections.getConnection(connectionName)
+  const {
+    connection: { endpoint: uri }
+  } = Connections.getConnection(connectionName)
 
   if (!topic) {
     throw Error(`topic is not found for ${connectionName}`)
@@ -31,9 +35,16 @@ async function MqttSubscribe(step, context) {
   /*
    * 1. subscriber list에서 subscriber를 찾는다. 없으면, 생성한다.
    * 2. client.once(...)로 메시지를 취한다.
+   *
+   * TODO 동일 브로커의 다중 subscribe 태스크에 대해서 완벽한 지원을 해야한다.
+   * - 현재는 여러 태스크가 동일 topic을 subscribe 하는 경우에 정상동작하지 않을 것이다.
    */
   if (!context.__mqtt_subscriber[name]) {
     try {
+      const broker = await mqtt.connectAsync(uri)
+
+      logger.info(`mqtt-connector connection(${connectionName}:${uri}) is connected`)
+
       await broker.subscribe(topic)
       logger.info(`success subscribing topic '${topic}'`)
 
@@ -63,6 +74,15 @@ async function MqttSubscribe(step, context) {
         MESSAGE.push(convertDataFormat(message, dataFormat))
 
         logger.info(`mqtt-subscribe :\n'${message.toString()}'`)
+      })
+
+      closures.push(async () => {
+        try {
+          broker && (await broker.end())
+          logger.info(`mqtt-connector connection(${connectionName}:${uri}) is disconnected`)
+        } catch (e) {
+          logger.error(e)
+        }
       })
     } catch (e) {
       logger.error(e)

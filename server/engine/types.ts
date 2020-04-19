@@ -41,6 +41,7 @@ export type Context = {
   variables: Object
   client: Object /* graphql local client */
   root: Object
+  closures: Function[]
 }
 
 export type TaskHandler = (

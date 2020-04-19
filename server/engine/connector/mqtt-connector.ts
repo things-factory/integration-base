@@ -16,7 +16,10 @@ export class MqttConnector implements Connector {
     try {
       const client = await mqtt.connectAsync(uri)
 
-      Connections.addConnection(connection.name, client)
+      Connections.addConnection(connection.name, {
+        client,
+        connection
+      })
 
       Connections.logger.info(`mqtt-connector connection(${connection.name}:${connection.endpoint}) is connected`)
     } catch (err) {
@@ -25,7 +28,7 @@ export class MqttConnector implements Connector {
   }
 
   async disconnect(name) {
-    const client = Connections.removeConnection(name)
+    const { client } = Connections.removeConnection(name)
 
     client && (await client.end())
   }
