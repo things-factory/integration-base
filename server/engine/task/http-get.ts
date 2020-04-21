@@ -4,9 +4,9 @@ import { GET_AUTH_HEADERS } from './http-auth'
 import fetch from 'node-fetch'
 import { URL } from 'url'
 
-async function HttpGet(step, { logger }) {
+async function HttpGet(step, { logger, data }) {
   var { connection: connectionName, params: stepOptions } = step
-  var { headers, params = {}, path } = stepOptions || {}
+  var { headers: requestHeaders, searchParams = {}, path } = stepOptions || {}
   var connection = Connections.getConnection(connectionName)
 
   if (!connection) {
@@ -16,25 +16,31 @@ async function HttpGet(step, { logger }) {
   var { endpoint, params: connectionParams } = connection
 
   var url = new URL(path, endpoint)
-  // Object.keys(params).forEach(key => url.searchParams.append(key, params[key]))
+  Object.keys(searchParams).forEach(key => {
+    let value = searchParams[key]
+    // TODO value를 accessor로 해석가능하도록 하고, 그 결과를 value로 한다.
+    url.searchParams.append(key, value)
+  })
+
+  var headers = GET_AUTH_HEADERS(connectionParams) || {}
+  Object.keys(requestHeaders).forEach(key => (headers[key] = requestHeaders[key]))
 
   var response = await fetch(url, {
     method: 'GET',
-    headers: {
-      ...(GET_AUTH_HEADERS(connectionParams) || {})
-      // ...headers
-    }
+    headers
   })
 
-  // TODO follow the format
-  // plain-text
-  var data = await response.json()
-  // var data = await response.text()
+  var responseData = await response.text()
 
-  logger.info(`http-get : \n${JSON.stringify(data, null, 2)}`)
+  const responseContentType = response.headers.get('content-type')
+  if (responseContentType && responseContentType.indexOf('application/json') !== -1) {
+    responseData = JSON.stringify(responseData)
+  }
+
+  logger.info(`http-get : \n${JSON.stringify(responseData, null, 2)}`)
 
   return {
-    data
+    data: responseData
   }
 }
 
@@ -51,8 +57,8 @@ HttpGet.parameterSpec = [
   },
   {
     type: 'http-parameters',
-    name: 'params',
-    label: 'params'
+    name: 'searchParams',
+    label: 'search-params'
   }
 ]
 
