@@ -4,6 +4,9 @@ import { GET_AUTH_HEADERS } from './http-auth'
 import fetch from 'node-fetch'
 import { URL } from 'url'
 
+const SELF = function (o) {
+  return o
+}
 async function HttpGet(step, { logger, data }) {
   var { connection: connectionName, params: stepOptions } = step
   var { headers: requestHeaders, searchParams = {}, path } = stepOptions || {}
@@ -14,16 +17,15 @@ async function HttpGet(step, { logger, data }) {
   }
 
   var { endpoint, params: connectionParams } = connection
-
   var url = new URL(path, endpoint)
-  Object.keys(searchParams).forEach(key => {
-    let value = searchParams[key]
-    // TODO value를 accessor로 해석가능하도록 하고, 그 결과를 value로 한다.
-    url.searchParams.append(key, value)
-  })
-
+  if (searchParams) {
+    Object.keys(searchParams).forEach(key => {
+      let value = substituteValue(searchParams[key], data)
+      url.searchParams.append(key, value)
+    })
+  }
   var headers = GET_AUTH_HEADERS(connectionParams) || {}
-  Object.keys(requestHeaders).forEach(key => (headers[key] = requestHeaders[key]))
+  if (requestHeaders) Object.keys(requestHeaders).forEach(key => (headers[key] = requestHeaders[key]))
 
   var response = await fetch(url, {
     method: 'GET',
@@ -41,6 +43,46 @@ async function HttpGet(step, { logger, data }) {
 
   return {
     data: responseData
+  }
+
+}
+function substituteValue(value, data) {
+  var text = String(value)
+  var prop = parse((text.match(/#{[^}]*}/gi)[0] || []))
+  if (prop && data.hasOwnProperty(prop.target)) {
+    return prop.accessor(data[prop.target])
+  }
+  return value
+}
+
+function parse(text) {
+  var defaultIndex = text.indexOf('||')
+  var originText = ''
+  var defaultValue = ''
+  if (defaultIndex != -1) {
+    originText = text
+    defaultValue = text.substring(defaultIndex + 2, text.length - 1).trim()
+    text = text.replace(text.substring(defaultIndex, text.length - 1), '').trim()
+  }
+  var parsed = text
+    .substr(2, text.length - 3)
+    .trim()
+    .replace(/\[(\w+)\]/g, '.$1')
+    .replace(/^\./, '')
+    .split('.')
+    .filter(accessor => !!accessor.trim())
+  var accessors = parsed.slice(1)
+  return {
+    defaultValue: defaultValue,
+    match: text,
+    originText: originText || text,
+    target: parsed[0],
+    accessor:
+      accessors.length > 0
+        ? function (o) {
+          return accessors.reduce((o, accessor) => (o ? o[accessor] : undefined), o)
+        }
+        : SELF
   }
 }
 
