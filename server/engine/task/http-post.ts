@@ -19,7 +19,7 @@ async function HttpPost(step, { logger, data }) {
   var url = new URL(path, endpoint)
 
   var headers = GET_AUTH_HEADERS(connectionParams) || {}
-  Object.keys(requestHeaders).forEach(key => (headers[key] = requestHeaders[key]))
+  if (requestHeaders) Object.keys(requestHeaders).forEach(key => (headers[key] = requestHeaders[key]))
 
   var body = accessor ? data[accessor] : undefined
   if (contentType && body) {
