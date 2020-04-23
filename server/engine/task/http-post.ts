@@ -26,7 +26,7 @@ async function HttpPost(step, { logger, data }) {
     headers['content-type'] = contentType
     switch (contentType) {
       case 'text/plain':
-        body = String(body)
+        body = JSON.stringify(body)
         break
       case 'application/json':
         body = JSON.stringify(body)
