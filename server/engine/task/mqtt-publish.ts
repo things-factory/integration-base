@@ -12,8 +12,8 @@ async function MqttPublish(step, { logger, data }) {
     throw Error(`connection is not found : ${connectionName}`)
   }
 
-  if (!accessor) {
-    throw Error(`accessor should be defined`)
+  if (!topic || !accessor) {
+    throw Error(`topic and accessor should be defined: : topic - '${topic}', accessor - '${accessor}'`)
   }
 
   var message = JSON.stringify(data[accessor])
