@@ -5,8 +5,8 @@ async function Publish(step, { logger, publish, data }) {
     params: { tag, accessor }
   } = step
 
-  if (!accessor) {
-    throw Error(`accessor should be defined`)
+  if (!tag || !accessor) {
+    throw Error(`tag and accessor should be defined: tag - '${tag}', accessor - '${accessor}'`)
   }
 
   publish(tag, data[accessor])
