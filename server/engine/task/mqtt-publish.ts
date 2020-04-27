@@ -1,10 +1,10 @@
 import { TaskRegistry } from '../task-registry'
 import { Connections } from '../connections'
 
-async function MqttPublish(step, { logger }) {
+async function MqttPublish(step, { logger, data }) {
   var {
     connection: connectionName,
-    params: { topic, message }
+    params: { topic, accessor }
   } = step
 
   const { client } = Connections.getConnection(connectionName)
@@ -12,6 +12,11 @@ async function MqttPublish(step, { logger }) {
     throw Error(`connection is not found : ${connectionName}`)
   }
 
+  if (!accessor) {
+    throw Error(`accessor should be defined`)
+  }
+
+  var message = JSON.stringify(data[accessor])
   await client.publish(topic, message)
 
   logger.info(`mqtt-publish :\ntopic '${topic}',\nmessage '${message}'`)
@@ -29,8 +34,8 @@ MqttPublish.parameterSpec = [
   },
   {
     type: 'string',
-    name: 'message',
-    label: 'message'
+    name: 'accessor',
+    label: 'accessor'
   }
 ]
 

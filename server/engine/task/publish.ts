@@ -5,9 +5,15 @@ async function Publish(step, { logger, publish, data }) {
     params: { tag, accessor }
   } = step
 
+  if (!accessor) {
+    throw Error(`accessor should be defined`)
+  }
+
   publish(tag, data[accessor])
 
-  return { data }
+  return {
+    data: data[accessor]
+  }
 }
 
 Publish.parameterSpec = [
