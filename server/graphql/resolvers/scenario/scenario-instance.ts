@@ -2,7 +2,18 @@ import { ScenarioEngine, ScenarioInstanceStatus } from '../../../engine/scenario
 
 export const scenarioInstanceResolver = {
   scenarioInstance(_: any, { instanceName }, context: any) {
-    var { domain, scenarioName, context: instanceContext, progress } = ScenarioEngine.getScenarioInstance(instanceName)
+    var scenarioInstance = ScenarioEngine.getScenarioInstance(instanceName)
+    if (!scenarioInstance) {
+      throw `ScenarioInstance(${instanceName}) Not Found.`
+    }
+
+    var { domain, scenarioName } = scenarioInstance
+
+    if (context.state.domain.id !== domain.id) {
+      throw `ScenarioInstance(${instanceName}) Not Found in domain(${context.state.domain.name}).`
+    }
+
+    var { domain, scenarioName, context: instanceContext, progress } = scenarioInstance
     var { variables, data, state } = instanceContext || {}
 
     return {
