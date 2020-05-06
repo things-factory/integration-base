@@ -1,7 +1,8 @@
 import { Connections } from '../connections'
 import { TaskRegistry } from '../task-registry'
 
-async function DatabaseQuery(step, { logger, data }) {
+async function DatabaseQuery(step, context) {
+  var { logger, data } = context
   var {
     connection: connectionName,
     params: { query }
@@ -9,6 +10,7 @@ async function DatabaseQuery(step, { logger, data }) {
 
   var dbconnection = Connections.getConnection(connectionName)
 
+  query = new Function(`return \`${query}\`;`).apply(context)
   var data = await dbconnection.query(query, [])
 
   logger.info(JSON.stringify(data, null, 2))
