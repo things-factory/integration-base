@@ -48,7 +48,8 @@ async function HttpGet(step, { logger, data }) {
 }
 function substituteValue(value, data) {
   var text = String(value)
-  var prop = parse((text.match(/#{[^}]*}/gi)[0] || []))
+  var substituteVal = text.match(/#{[^}]*}/gi)
+  var prop = substituteVal ? parse(substituteVal[0]) : undefined
   if (prop && data.hasOwnProperty(prop.target)) {
     return prop.accessor(data[prop.target])
   }
