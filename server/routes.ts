@@ -1,7 +1,6 @@
 import koaBodyParser from 'koa-bodyparser'
 import { ScenarioFlow } from './entities/scenario-flow'
-import { secureRouter } from '@things-factory/auth-base/dist-server/router'
-
+import { secureRouter } from '@things-factory/auth-base'
 import { getRepository } from 'typeorm'
 
 process.on('bootstrap-module-history-fallback' as any, (app, fallbackOption) => {
