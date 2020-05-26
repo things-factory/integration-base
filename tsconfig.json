@@ -5,6 +5,7 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "esModuleInterop": true,
+    "declaration": true,
     "moduleResolution": "node",
     "types": ["node"],
     "module": "commonjs",
