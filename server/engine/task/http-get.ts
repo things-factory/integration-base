@@ -36,7 +36,7 @@ async function HttpGet(step, { logger, data }) {
 
   const responseContentType = response.headers.get('content-type')
   if (responseContentType && responseContentType.indexOf('application/json') !== -1) {
-    responseData = JSON.stringify(responseData)
+    responseData = JSON.parse(responseData)
   }
 
   logger.info(`http-get : \n${JSON.stringify(responseData, null, 2)}`)
