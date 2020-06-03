@@ -28,8 +28,6 @@
     "migration:revert": "node ./node_modules/typeorm/cli.js migration:revert"
   },
   "dependencies": {
-    "@koa/router": "^8.0.8",
-    "@things-factory/auth-base": "^2.5.0",
     "async-mqtt": "^2.5.0",
     "cron": "^1.7.2",
     "cross-fetch": "^3.0.4",
