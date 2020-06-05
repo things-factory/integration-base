@@ -1,4 +1,4 @@
-import { Connection } from '../entities'
+import { Connection, Step } from '../entities'
 
 export interface PropertySpec {
   type: string
@@ -13,15 +13,16 @@ export interface Connector {
   connect(connection: Connection): Promise<any>
   disconnect(name: string): Promise<any>
   parameterSpec: PropertySpec[]
+  taskPrefixes?: string[]
 }
 
-export interface Step {
-  sequence?: string
-  type: string /* task */
-  connection?: string /* TODO should be a connection name of params */
-  name?: string /* TODO should be one of params for task */
-  [propName: string]: any
-}
+// export interface Step {
+//   sequence?: string
+//   type: string /* task */
+//   connection?: string /* TODO should be a connection name of params */
+//   name?: string /* TODO should be one of params for task */
+//   [propName: string]: any
+// }
 
 export enum SCENARIO_STATE {
   READY,

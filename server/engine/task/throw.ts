@@ -19,4 +19,6 @@ Throw.parameterSpec = [
   }
 ]
 
+Throw.connectorFree = true
+
 TaskRegistry.registerTaskHandler('throw', Throw)

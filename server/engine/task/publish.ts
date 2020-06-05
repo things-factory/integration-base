@@ -29,4 +29,6 @@ Publish.parameterSpec = [
   }
 ]
 
+Publish.connectorFree = true
+
 TaskRegistry.registerTaskHandler('publish', Publish)

@@ -5,5 +5,6 @@ export const Connector = gql`
     name: String
     description: String
     parameterSpec: [PropertySpec]
+    taskPrefixes: [String]
   }
 `

@@ -36,6 +36,10 @@ export class MqttConnector implements Connector {
   get parameterSpec() {
     return []
   }
+
+  get taskPrefixes() {
+    return ['mqtt']
+  }
 }
 
 Connections.registerConnector('mqtt-connector', new MqttConnector())

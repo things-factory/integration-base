@@ -18,4 +18,6 @@ Goto.parameterSpec = [
   }
 ]
 
+Goto.connectorFree = true
+
 TaskRegistry.registerTaskHandler('goto', Goto)

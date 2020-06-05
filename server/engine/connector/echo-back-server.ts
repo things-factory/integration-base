@@ -16,11 +16,11 @@ export class EchoBack implements Connector {
 
     return new Promise((resolve, reject) => {
       var server = net.createServer(socket => {
-        socket.on('data', function(data) {
+        socket.on('data', function (data) {
           socket.write(data.toString())
         })
 
-        socket.on('error', function(err) {
+        socket.on('error', function (err) {
           Connections.logger.error(err)
           reject(err)
         })

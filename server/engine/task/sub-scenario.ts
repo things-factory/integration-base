@@ -40,4 +40,6 @@ SubScenario.parameterSpec = [
   }
 ]
 
+SubScenario.connectorFree = true
+
 TaskRegistry.registerTaskHandler('scenario', SubScenario)

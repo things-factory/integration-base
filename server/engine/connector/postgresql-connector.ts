@@ -68,6 +68,10 @@ export class PostgresqlConnector implements Connector {
       }
     ]
   }
+
+  get taskPrefixes() {
+    return ['database']
+  }
 }
 
 Connections.registerConnector('postgresql-connector', new PostgresqlConnector())

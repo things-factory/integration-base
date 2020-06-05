@@ -71,39 +71,39 @@ export class Connections {
     })
   }
 
-  static registerConnector(type, connector) {
+  static registerConnector(type: string, connector: Connector) {
     Connections.connectors[type] = connector
   }
 
-  static getConnector(type) {
+  static getConnector(type: string): Connector {
     return Connections.connectors[type]
   }
 
-  static getConnectors(): { [propName: string]: Connector } {
+  static getConnectors(): { [connectorName: string]: Connector } {
     return {
       ...Connections.connectors
     }
   }
 
-  static unregisterConnector(type) {
+  static unregisterConnector(type: string) {
     delete Connections.connectors[type]
   }
 
-  static getConnection(name) {
+  static getConnection(name: string): any {
     return Connections.connections[name]
   }
 
-  static getConnections() {
+  static getConnections(): { [connectionName: string]: any } {
     return {
       ...Connections.connections
     }
   }
 
-  static addConnection(name, connection) {
+  static addConnection(name: string, connection: any) {
     Connections.connections[name] = connection
   }
 
-  static removeConnection(name) {
+  static removeConnection(name): any {
     var connection = Connections.connections[name]
     delete Connections.connections[name]
     return connection

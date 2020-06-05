@@ -83,6 +83,10 @@ export class GraphqlConnector implements Connector {
   get parameterSpec() {
     return []
   }
+
+  get taskPrefixes() {
+    return ['graphql']
+  }
 }
 
 Connections.registerConnector('graphql-connector', new GraphqlConnector())

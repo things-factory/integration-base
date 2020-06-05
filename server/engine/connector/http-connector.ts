@@ -47,6 +47,10 @@ export class HttpConnector implements Connector {
       }
     ]
   }
+
+  get taskPrefixes() {
+    return ['http']
+  }
 }
 
 Connections.registerConnector('http-connector', new HttpConnector())

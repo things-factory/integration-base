@@ -3,6 +3,7 @@ import { TaskTypeList } from './task-type-list'
 
 export const Query = `
   taskTypes: TaskTypeList
+  taskTypesByConnection(connectionName: String): TaskTypeList
   taskType(name: String!): TaskType
 `
 

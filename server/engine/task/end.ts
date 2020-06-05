@@ -9,4 +9,6 @@ async function End(step, { logger }) {
 
 End.parameterSpec = []
 
+End.connectorFree = true
+
 TaskRegistry.registerTaskHandler('end', End)

@@ -22,4 +22,6 @@ Script.parameterSpec = [
   }
 ]
 
+Script.connectorFree = true
+
 TaskRegistry.registerTaskHandler('script', Script)

@@ -32,6 +32,10 @@ export class EchoBack implements Connector {
   get parameterSpec() {
     return []
   }
+
+  get taskPrefixes() {
+    return ['echo']
+  }
 }
 
 Connections.registerConnector('echo-back', new EchoBack())

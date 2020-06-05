@@ -78,4 +78,6 @@ SwitchRange.parameterSpec = [
   }
 ]
 
+SwitchRange.connectorFree = true
+
 TaskRegistry.registerTaskHandler('switch-range', SwitchRange)

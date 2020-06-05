@@ -5,10 +5,12 @@ export const connectorsResolver = {
     var connectors = Connections.getConnectors()
     var items = Object.keys(connectors)
       .map(name => {
+        var connector = connectors[name]
         return {
           name,
           description: '',
-          parameterSpec: connectors[name].parameterSpec
+          parameterSpec: connector.parameterSpec,
+          taskPrefixes: connector.taskPrefixes || []
         }
       })
       .sort((x, y) => {

@@ -26,4 +26,6 @@ Sleep.parameterSpec = [
   }
 ]
 
+Sleep.connectorFree = true
+
 TaskRegistry.registerTaskHandler('sleep', Sleep)

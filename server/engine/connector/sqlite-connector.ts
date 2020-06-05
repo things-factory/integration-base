@@ -43,6 +43,10 @@ export class SqliteConnector implements Connector {
   get parameterSpec() {
     return []
   }
+
+  get taskPrefixes() {
+    return ['database']
+  }
 }
 
 Connections.registerConnector('sqlite-connector', new SqliteConnector())

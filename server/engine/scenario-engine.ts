@@ -4,10 +4,10 @@ import { Domain, pubsub } from '@things-factory/shell'
 import { sleep } from '@things-factory/utils'
 
 import { TaskRegistry } from './task-registry'
-import { Step, Context, SCENARIO_STATE } from './types'
+import { Context, SCENARIO_STATE } from './types'
 
 import { getRepository } from 'typeorm'
-import { Scenario } from '../entities'
+import { Scenario, Step } from '../entities'
 import { CronJob } from 'cron'
 import orderBy from 'lodash/orderBy'
 

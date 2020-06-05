@@ -5,5 +5,6 @@ export const TaskType = gql`
     name: String
     description: String
     parameterSpec: [PropertySpec]
+    connectorFree: Boolean
   }
 `

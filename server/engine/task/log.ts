@@ -37,4 +37,6 @@ Log.parameterSpec = [
   }
 ]
 
+Log.connectorFree = true
+
 TaskRegistry.registerTaskHandler('log', Log)
