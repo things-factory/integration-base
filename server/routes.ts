@@ -1,5 +1,5 @@
 process.on('bootstrap-module-history-fallback' as any, (app, fallbackOption) => {
-  var paths = ['modeller', 'integration']
+  var paths = ['modeller']
   fallbackOption.whiteList.push(`^\/(${paths.join('|')})($|[/?#])`)
 })
 
