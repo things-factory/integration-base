@@ -19,13 +19,6 @@ export const connectorResolver = {
       where: { domain: context.state.domain, name: connectionName }
     })
 
-    var connector = Connections.getConnector(connection.type)
-
-    return {
-      name: connection,
-      description: '',
-      parameterSpec: connector.parameterSpec,
-      taskPrefixes: connector.taskPrefixes || []
-    }
+    return connection && Connections.getConnector(connection.type)
   }
 }

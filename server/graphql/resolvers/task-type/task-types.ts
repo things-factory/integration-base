@@ -33,8 +33,10 @@ export const taskTypesResolver = {
         where: { domain: context.state.domain, name: connectionName }
       })
 
-      var connector = Connections.getConnector(connection.type)
-      taskPrefixes = connector.taskPrefixes || []
+      if (connection) {
+        var connector = Connections.getConnector(connection.type)
+        taskPrefixes = connector.taskPrefixes || []
+      }
     }
 
     var taskTypes = TaskRegistry.getTaskHandlers()
