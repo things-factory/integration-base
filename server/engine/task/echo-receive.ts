@@ -11,7 +11,7 @@ async function EchoReceive(step, { logger }) {
   logger.info(`echo-receive : '${message.toString()}'`)
 
   return {
-    data: message
+    data: message.toString()
   }
 }
 
