@@ -52,6 +52,11 @@ export class Step {
   @Column({
     nullable: true
   })
+  log: boolean
+
+  @Column({
+    nullable: true
+  })
   connection: string
 
   @Column({

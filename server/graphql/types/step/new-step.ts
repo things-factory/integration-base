@@ -7,6 +7,7 @@ export const NewStep = gql`
     sequence: Int
     task: String
     skip: Boolean
+    log: Boolean
     connection: String
     params: String
   }
