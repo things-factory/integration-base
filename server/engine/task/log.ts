@@ -1,9 +1,15 @@
+import { access } from '@things-factory/utils'
 import { TaskRegistry } from '../task-registry'
 
 async function Log(step, { logger }) {
   var {
-    params: { message, level = 'info' }
+    params: { message, accessor, level = 'info' }
   } = step
+
+  message = access(accessor) || message
+  if (typeof message !== 'string') {
+    message = JSON.stringify(message, null, 2)
+  }
 
   switch (level) {
     case 'error':
@@ -22,6 +28,11 @@ async function Log(step, { logger }) {
 }
 
 Log.parameterSpec = [
+  {
+    type: 'string',
+    name: 'accessor',
+    label: 'accessor'
+  },
   {
     type: 'string',
     name: 'message',
