@@ -7,7 +7,6 @@ async function Script(step, context) {
   var { logger } = context || {}
 
   var result = new Function(script).apply(context)
-  logger.info(`script done: ${result}`)
 
   return {
     data: result
