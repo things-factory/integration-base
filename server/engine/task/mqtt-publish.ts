@@ -1,3 +1,4 @@
+import { access } from '@things-factory/utils'
 import { TaskRegistry } from '../task-registry'
 import { Connections } from '../connections'
 
@@ -16,7 +17,7 @@ async function MqttPublish(step, { logger, data }) {
     throw Error(`topic and accessor should be defined: : topic - '${topic}', accessor - '${accessor}'`)
   }
 
-  var message = JSON.stringify(data[accessor])
+  var message = JSON.stringify(access(accessor, data))
   await client.publish(topic, message)
 
   logger.info(`mqtt-publish :\ntopic '${topic}',\nmessage '${message}'`)

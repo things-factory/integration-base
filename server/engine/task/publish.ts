@@ -1,3 +1,4 @@
+import { access } from '@things-factory/utils'
 import { TaskRegistry } from '../task-registry'
 
 async function Publish(step, { logger, publish, data }) {
@@ -9,10 +10,12 @@ async function Publish(step, { logger, publish, data }) {
     throw Error(`tag and accessor should be defined: tag - '${tag}', accessor - '${accessor}'`)
   }
 
-  publish(tag, data[accessor])
+  var value = access(accessor, data)
+
+  publish(tag, value)
 
   return {
-    data: data[accessor]
+    data: value
   }
 }
 

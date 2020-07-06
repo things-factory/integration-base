@@ -1,8 +1,9 @@
+import fetch from 'node-fetch'
+import { URL } from 'url'
+import { access } from '@things-factory/utils'
 import { TaskRegistry } from '../task-registry'
 import { Connections } from '../connections'
 import { GET_AUTH_HEADERS } from './http-auth'
-import fetch from 'node-fetch'
-import { URL } from 'url'
 
 async function HttpPost(step, { logger, data }) {
   var { connection: connectionName, params: stepOptions } = step
@@ -21,7 +22,7 @@ async function HttpPost(step, { logger, data }) {
   var headers = GET_AUTH_HEADERS(connectionParams) || {}
   if (requestHeaders) Object.keys(requestHeaders).forEach(key => (headers[key] = requestHeaders[key]))
 
-  var body = accessor ? data[accessor] : undefined
+  var body = access(accessor, data)
   if (contentType && body) {
     headers['content-type'] = contentType
     switch (contentType) {
