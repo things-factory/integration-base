@@ -1,12 +1,12 @@
 import { access } from '@things-factory/utils'
 import { TaskRegistry } from '../task-registry'
 
-async function Log(step, { logger }) {
+async function Log(step, { logger, data }) {
   var {
     params: { message, accessor, level = 'info' }
   } = step
 
-  message = access(accessor) || message
+  message = access(accessor, data) || message
   if (typeof message !== 'string') {
     message = JSON.stringify(message, null, 2)
   }
