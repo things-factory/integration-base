@@ -1,3 +1,4 @@
+import util from 'util'
 import { createLogger, format, transports } from 'winston'
 import 'winston-daily-rotate-file'
 import { Domain, pubsub } from '@things-factory/shell'
@@ -188,7 +189,9 @@ export class ScenarioEngine {
         await sleep(1)
       }
     } catch (ex) {
-      this.message = ex.stack ? ex.stack : ex
+      let message = ex.stack ? ex.stack : ex
+      this.message = typeof message == 'object' ? JSON.stringify(message, null, 2) : message
+
       this.setState(SCENARIO_STATE.HALTED)
     }
   }
@@ -275,13 +278,13 @@ export class ScenarioEngine {
       return
     }
 
-    var message = `${this.instanceName}:[state changed] ${ScenarioInstanceStatus[this.getState()]} => ${
+    var log = `${this.instanceName}:[state changed] ${ScenarioInstanceStatus[this.getState()]} => ${
       ScenarioInstanceStatus[state]
-    }${this.message ? ' caused by ' + this.message : ''}`
+    }${this.message ? ' caused by ' + util.inspect(this.message, false, 2, true) : ''}`
 
     this.message = ''
 
-    this.context.logger.info(message)
+    this.context.logger.info(log)
     this.context.state = state
 
     if (state == SCENARIO_STATE.STOPPED || state == SCENARIO_STATE.HALTED) {
@@ -291,7 +294,7 @@ export class ScenarioEngine {
       }
     }
 
-    this.publishState(message)
+    this.publishState(log)
   }
 
   start() {
