@@ -44,7 +44,6 @@ async function HttpGet(step, { logger, data }) {
   return {
     data: responseData
   }
-
 }
 function substituteValue(value, data) {
   var text = String(value)
@@ -81,8 +80,8 @@ function parse(text) {
     accessor:
       accessors.length > 0
         ? function (o) {
-          return accessors.reduce((o, accessor) => (o ? o[accessor] : undefined), o)
-        }
+            return accessors.reduce((o, accessor) => (o ? o[accessor] : undefined), o)
+          }
         : SELF
   }
 }

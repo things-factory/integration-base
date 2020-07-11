@@ -16,7 +16,7 @@ async function SubScenario(step, context) {
   })
 
   logger.info(`Sub Scenario '${subscenario.name}' Started.`)
-  let subContext = await load(step, subscenario, context)
+  var subContext = await load(step, subscenario, context)
   logger.info(`Sub Scenario '${subscenario.name}' done.`)
 
   return {

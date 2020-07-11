@@ -12,12 +12,10 @@ async function EchoSend(step, { logger }) {
     throw Error(`connection is not found : ${connectionName}`)
   }
 
-  var retval = await connection.write(message)
-
-  logger.info(`echo-send : '${message}'`)
+  var data = await connection.write(message)
 
   return {
-    data: retval
+    data
   }
 }
 

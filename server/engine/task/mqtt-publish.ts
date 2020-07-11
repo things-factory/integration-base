@@ -20,8 +20,6 @@ async function MqttPublish(step, { logger, data }) {
   var message = JSON.stringify(access(accessor, data))
   await client.publish(topic, message)
 
-  logger.info(`mqtt-publish :\ntopic '${topic}',\nmessage '${message}'`)
-
   return {
     data: message
   }

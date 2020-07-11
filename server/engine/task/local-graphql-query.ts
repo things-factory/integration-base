@@ -1,16 +1,15 @@
 import { TaskRegistry } from '../task-registry'
-import { Connections } from '../connections'
 // import { schema } from '@things-factory/shell/dist-server/schema'
 import gql from 'graphql-tag'
 
 async function LocalGraphqlQuery(step, context) {
-  var { connection: connectionName, params: stepOptions } = step
-  var { query } = stepOptions || {}
+  var { connection, params } = step
+  var { query } = params || {}
   var { logger, client, domain } = context
 
   query = new Function(`return \`${query}\`;`).apply(context)
 
-  var response = await client.query({
+  var { data } = await client.query({
     query: gql`
       ${query}
     `,
@@ -20,10 +19,6 @@ async function LocalGraphqlQuery(step, context) {
       }
     }
   })
-
-  var data = response.data
-
-  logger.info(`local-graphql-query : \n${JSON.stringify(data, null, 2)}`)
 
   return {
     data

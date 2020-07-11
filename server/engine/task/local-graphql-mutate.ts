@@ -4,13 +4,13 @@ import { Connections } from '../connections'
 import gql from 'graphql-tag'
 
 async function LocalGraphqlMutate(step, context) {
-  var { connection: connectionName, params: stepOptions } = step
-  var { mutation } = stepOptions || {}
+  var { connection, params } = step
+  var { mutation } = params || {}
   var { logger, client, domain } = context
 
   mutation = new Function(`return \`${mutation}\`;`).apply(context)
 
-  var response = await client.mutate({
+  var { data } = await client.mutate({
     mutation: gql`
       ${mutation}
     `,
@@ -20,10 +20,6 @@ async function LocalGraphqlMutate(step, context) {
       }
     }
   })
-
-  var data = response.data
-
-  logger.info(`local-graphql-mutate : \n${JSON.stringify(data, null, 2)}`)
 
   return {
     data

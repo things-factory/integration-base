@@ -55,8 +55,6 @@ async function HttpPost(step, { logger, data }) {
     responseData = JSON.stringify(responseData)
   }
 
-  logger.info(`http-post : \n${JSON.stringify(responseData, null, 2)}`)
-
   return {
     data: responseData
   }
