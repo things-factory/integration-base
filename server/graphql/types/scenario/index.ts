@@ -48,6 +48,12 @@ export const Mutation = `
   resumeScenario (
     instanceName: String!
   ): ScenarioInstance
+
+  callScenario (
+    instanceName: String
+    scenarioName: String!
+    variables: Object
+  ): ScenarioInstance
 `
 
 export const Query = `
