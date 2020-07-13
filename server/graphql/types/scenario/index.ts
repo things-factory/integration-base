@@ -49,7 +49,7 @@ export const Mutation = `
     instanceName: String!
   ): ScenarioInstance
 
-  callScenario (
+  runScenario (
     instanceName: String
     scenarioName: String!
     variables: Object

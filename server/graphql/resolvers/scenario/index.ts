@@ -12,7 +12,7 @@ import { startScenario } from './start-scenario'
 import { stopScenario } from './stop-scenario'
 import { pauseScenario } from './pause-scenario'
 import { resumeScenario } from './resume-scenario'
-import { callScenario } from './call-scenario'
+import { runScenario } from './run-scenario'
 
 import { scenarioInstanceResolver } from './scenario-instance'
 import { scenarioInstancesResolver } from './scenario-instances'
@@ -37,7 +37,7 @@ export const Mutation = {
   ...stopScenario,
   ...pauseScenario,
   ...resumeScenario,
-  ...callScenario
+  ...runScenario
 }
 
 export const Subscription = {

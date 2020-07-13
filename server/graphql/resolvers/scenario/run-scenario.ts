@@ -6,8 +6,8 @@ import { ScenarioEngine, ScenarioInstanceStatus } from '../../../engine/scenario
  * 동기적인 시나리오 호출
  * 호출된 시나리오가 종료된 후 그 결과를 리턴한다.
  */
-export const callScenario = {
-  async callScenario(_: any, { instanceName, scenarioName, variables }, context: any) {
+export const runScenario = {
+  async runScenario(_: any, { instanceName, scenarioName, variables }, context: any) {
     var repository = getRepository(Scenario)
     var scenario = await repository.findOne({
       where: { domain: context.state.domain, name: scenarioName },
