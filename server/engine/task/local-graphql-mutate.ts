@@ -34,4 +34,6 @@ LocalGraphqlMutate.parameterSpec = [
   }
 ]
 
+LocalGraphqlMutate.connectorFree = true
+
 TaskRegistry.registerTaskHandler('local-graphql-mutate', LocalGraphqlMutate)

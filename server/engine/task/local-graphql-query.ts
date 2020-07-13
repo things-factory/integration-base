@@ -33,4 +33,6 @@ LocalGraphqlQuery.parameterSpec = [
   }
 ]
 
+LocalGraphqlQuery.connectorFree = true
+
 TaskRegistry.registerTaskHandler('local-graphql-query', LocalGraphqlQuery)
