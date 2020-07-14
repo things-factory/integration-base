@@ -6,7 +6,7 @@ import { Connections } from '../connections'
 
 export class EchoBack implements Connector {
   async ready(connectionConfigs) {
-    await Promise.all(connectionConfigs.map(this.connect))
+    await Promise.all(connectionConfigs.map(this.connect.bind(this)))
 
     Connections.logger.info('echo-back connections are ready')
   }
@@ -15,10 +15,17 @@ export class EchoBack implements Connector {
     let socket = new PromiseSocket(new net.Socket())
     let [host, port = 8124] = connection.endpoint.split(':')
 
-    await socket.connect(port, host)
-    Connections.addConnection(connection.name, socket)
+    try {
+      await socket.connect(port, host)
+      Connections.addConnection(connection.name, socket)
 
-    Connections.logger.info(`echo-back-connector connection(${connection.name}:${connection.endpoint}) is connected`)
+      Connections.logger.info(`echo-back-connector connection(${connection.name}:${connection.endpoint}) is connected`)
+    } catch (e) {
+      Connections.logger.error(
+        `echo-back-connector connection(${connection.name}:${connection.endpoint}) is not connected`
+      )
+      Connections.logger.error(e)
+    }
   }
 
   async disconnect(name) {

@@ -5,7 +5,7 @@ import mqtt from 'async-mqtt'
 
 export class MqttConnector implements Connector {
   async ready(connectionConfigs) {
-    await Promise.all(connectionConfigs.map(this.connect))
+    await Promise.all(connectionConfigs.map(this.connect.bind(this)))
 
     Connections.logger.info('mqtt-connector connections are ready')
   }
@@ -23,7 +23,8 @@ export class MqttConnector implements Connector {
 
       Connections.logger.info(`mqtt-connector connection(${connection.name}:${connection.endpoint}) is connected`)
     } catch (err) {
-      Connections.logger.error(`mqtt-connector connection(${connection.name}:${connection.endpoint}) is failed`, err)
+      Connections.logger.error(`mqtt-connector connection(${connection.name}:${connection.endpoint}) is failed`)
+      Connections.logger.error(err)
     }
   }
 

@@ -30,7 +30,7 @@ const cache = new InMemoryCache({
 
 export class GraphqlConnector implements Connector {
   async ready(connectionConfigs) {
-    await Promise.all(connectionConfigs.map(this.connect))
+    await Promise.all(connectionConfigs.map(this.connect.bind(this)))
 
     Connections.logger.info('graphql-connector connections are ready')
   }

@@ -3,7 +3,7 @@ import { Connections } from '../connections'
 
 export class HttpConnector implements Connector {
   async ready(connectionConfigs) {
-    await Promise.all(connectionConfigs.map(this.connect))
+    await Promise.all(connectionConfigs.map(this.connect.bind(this)))
 
     Connections.logger.info('http-connector connections are ready')
   }

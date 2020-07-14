@@ -6,7 +6,7 @@ const sqlite3 = require('sqlite3').verbose()
 
 export class SqliteConnector implements Connector {
   async ready(connectionConfigs) {
-    await Promise.all(connectionConfigs.map(this.connect))
+    await Promise.all(connectionConfigs.map(this.connect.bind(this)))
 
     Connections.logger.info('sqlite-connector connections are ready')
   }
@@ -16,7 +16,10 @@ export class SqliteConnector implements Connector {
 
     var database = new sqlite3.Database(endpoint, sqlite3.OPEN_READWRITE, err => {
       if (err) {
-        Connections.logger.error(err.message)
+        Connections.logger.error(`SQLite Database(${connection.name}) at ${endpoint} not connected.`)
+        Connections.logger.error(err)
+
+        return
       }
 
       Connections.addConnection(connection.name, {

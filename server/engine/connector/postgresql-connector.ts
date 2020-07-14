@@ -5,7 +5,7 @@ const { Client } = require('pg')
 
 export class PostgresqlConnector implements Connector {
   async ready(connectionConfigs) {
-    await Promise.all(connectionConfigs.map(this.connect))
+    await Promise.all(connectionConfigs.map(this.connect.bind(this)))
 
     Connections.logger.info('postgresql-connector connections are ready')
   }
@@ -25,16 +25,21 @@ export class PostgresqlConnector implements Connector {
       port: Number(port)
     })
 
-    await client.connect()
+    try {
+      await client.connect()
 
-    Connections.addConnection(connection.name, {
-      query: async (query, params) => {
-        return (await client.query(query, params)).rows
-      },
-      close: client.end.bind(client)
-    })
+      Connections.addConnection(connection.name, {
+        query: async (query, params) => {
+          return (await client.query(query, params)).rows
+        },
+        close: client.end.bind(client)
+      })
 
-    Connections.logger.info(`PostgresSQL Database(${connection.name}:${database}) at ${endpoint} connected.`)
+      Connections.logger.info(`PostgresSQL Database(${connection.name}:${database}) at ${endpoint} connected.`)
+    } catch (e) {
+      Connections.logger.error(`PostgresSQL Database(${connection.name}:${database}) at ${endpoint} not connected.`)
+      Connections.logger.error(e)
+    }
   }
 
   async disconnect(name) {
