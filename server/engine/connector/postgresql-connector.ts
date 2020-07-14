@@ -37,8 +37,9 @@ export class PostgresqlConnector implements Connector {
 
       Connections.logger.info(`PostgresSQL Database(${connection.name}:${database}) at ${endpoint} connected.`)
     } catch (e) {
-      Connections.logger.error(`PostgresSQL Database(${connection.name}:${database}) at ${endpoint} not connected.`)
-      Connections.logger.error(e)
+      Connections.logger.error(
+        `PostgresSQL Database(${connection.name}:${database}) at ${endpoint} not connected.\ncause: ${e}`
+      )
     }
   }
 

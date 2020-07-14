@@ -44,7 +44,9 @@ export class EchoBack implements Connector {
 
           resolve()
         } catch (err) {
-          Connections.logger.error(err)
+          Connections.logger.error(
+            `echo-back-server connection(${config.name}:${config.endpoint}) is connected.\ncause: ${err}`
+          )
           reject(err)
         }
       })

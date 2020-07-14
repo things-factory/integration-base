@@ -16,9 +16,7 @@ export class SqliteConnector implements Connector {
 
     var database = new sqlite3.Database(endpoint, sqlite3.OPEN_READWRITE, err => {
       if (err) {
-        Connections.logger.error(`SQLite Database(${connection.name}) at ${endpoint} not connected.`)
-        Connections.logger.error(err)
-
+        Connections.logger.error(`SQLite Database(${connection.name}) at ${endpoint} not connected.\ncause: ${err}`)
         return
       }
 

@@ -22,9 +22,8 @@ export class EchoBack implements Connector {
       Connections.logger.info(`echo-back-connector connection(${connection.name}:${connection.endpoint}) is connected`)
     } catch (e) {
       Connections.logger.error(
-        `echo-back-connector connection(${connection.name}:${connection.endpoint}) is not connected`
+        `echo-back-connector connection(${connection.name}:${connection.endpoint}) is not connected.\ncause: ${e}`
       )
-      Connections.logger.error(e)
     }
   }
 

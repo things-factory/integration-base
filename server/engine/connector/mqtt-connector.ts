@@ -23,8 +23,9 @@ export class MqttConnector implements Connector {
 
       Connections.logger.info(`mqtt-connector connection(${connection.name}:${connection.endpoint}) is connected`)
     } catch (err) {
-      Connections.logger.error(`mqtt-connector connection(${connection.name}:${connection.endpoint}) is failed`)
-      Connections.logger.error(err)
+      Connections.logger.error(
+        `mqtt-connector connection(${connection.name}:${connection.endpoint}) is failed.\ncause: ${err}`
+      )
     }
   }
 
