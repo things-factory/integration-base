@@ -182,6 +182,7 @@ export class ScenarioEngine {
           this.nextStep = this.nextStep + 1
         }
 
+        /* last step 에 의해서 시나리오 state를 변경할 수 있도록 함. */
         if (state !== undefined) {
           this.setState(state)
         }
@@ -319,15 +320,15 @@ export class ScenarioEngine {
   }
 
   stop() {
+    this.setState(SCENARIO_STATE.STOPPED)
+  }
+
+  dispose() {
     if (this.cronjob) {
       this.cronjob.stop()
       delete this.cronjob
     }
 
-    this.setState(SCENARIO_STATE.STOPPED)
-  }
-
-  dispose() {
     this.stop()
 
     var closure = this.context?.closures?.pop()
